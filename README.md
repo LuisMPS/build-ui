@@ -3,12 +3,10 @@
 Build-UI is a simple library thought for React developers packed with fetures that allow them to effortlessly create website builders. It comes with drag and drop functionality, undo-redo logic, site serialization and deserialization along with some other interesting tools out of the box. Because of the way it is built, it also supports other features such as SSR and component dynamic loading without you having to worry about their implementations.
 
 # Overview
-___
 
 With Build-UI, you can create anything from a very simple to a fully-featured website builder. Build-UI lets you create your website builder on top of your own or third-party React Components. With Build-UI, you only need a lightweight extra layer of code to handle website-building logic, which is made as simple and as transparent as possible.
 
 # Instalation
-___
 
 Currently, Build-UI is an early-stage project in development phase. You can install via npm with the command:
 
@@ -17,12 +15,10 @@ npm install --save build-ui
 ```
 
 # Demos
-___
 
 Coming soon! Cool demos are in our to-do list! You can also follow along our tutorial to see Build-UI in action.
 
 # Tutorial
-___
 
 Build-UI offers a set of React Components and tools to begin coding your website builder. Build-UI takes full advantage of component composition and sticks to React'w way of doing things. That's why it is possible to use your own components in your website builder. Let's explain what this all means:
 
