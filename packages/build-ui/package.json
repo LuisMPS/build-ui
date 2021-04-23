@@ -2,6 +2,10 @@
   "name": "build-ui",
   "version": "0.1.0-alpha.1",
   "description": "Code your own site builders with React",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/LuisMPS/build-ui.git"
+  },
   "main": "dist/index.js",
   "module": "dist/esm/index.js",
   "files": [
