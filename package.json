@@ -1,0 +1,17 @@
+{
+  "name": "build-ui-project",
+  "directories": {
+    "example": "examples"
+  },
+  "workspaces": [
+    "packages/*"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/LuisMPS/build-ui.git"
+  },
+  "bugs": {
+    "url": "https://github.com/LuisMPS/build-ui/issues"
+  },
+  "homepage": "https://github.com/LuisMPS/build-ui#readme"
+}
