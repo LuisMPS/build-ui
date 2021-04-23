@@ -1,0 +1,13 @@
+node_modules
+
+dist
+compiled
+*.log
+coverage
+.DS_Store
+next.d.ts
+legacy.d.ts
+.idea
+*.orig
+.DS_Store
+
