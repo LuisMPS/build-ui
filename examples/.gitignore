@@ -36,4 +36,5 @@ yarn-error.log*
 # Local installation
 .yalc
 yalc.lock
+local_example/
 
