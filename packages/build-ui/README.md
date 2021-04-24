@@ -8,7 +8,7 @@ Please be aware that Build-UI is currently an early-stage project in development
 
 With Build-UI, you can create anything from a very simple to a fully-featured website builder. Build-UI lets you create your website builder on top of your own or third-party React Components. With Build-UI, you only need a lightweight extra layer of code to handle website-building logic, which is made as simple and as transparent as possible.
 
-# Instalation
+# Installation
 
 You can install via npm with the command:
 
