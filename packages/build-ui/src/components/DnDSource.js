@@ -29,7 +29,6 @@ const DnDSource = ({
         // and mouse down events for drag
         // start).
         if (dragTouchActive) return;
-        console.log('drag start mouse...')
         onDragStart(event);
         draggingBox.current = true;
     }
@@ -44,7 +43,6 @@ const DnDSource = ({
         onDragOver(event);
     }
     const handleDropMouse = event => {
-        console.log('drop mouse...')
         event.dropTarget = box.current;
         onDrop(event);
     }
@@ -79,7 +77,6 @@ const DnDSource = ({
         // handling onDragEnd event for
         // this Source component.
         setTimeout(() => {
-            console.log('drag end touch...')
             batch(() => onDragEnd(event));
             draggingBox.current = false;
         }, 0);
@@ -90,7 +87,6 @@ const DnDSource = ({
     useEffect(() => {
         if (!dragTouchActive) return;
         const handleDragStart = () => {
-            console.log('drag start touch...')
             batch(() => {
                 setDragTouchActive(false);
                 setDragTouchEvent(null);
@@ -145,7 +141,6 @@ const DnDSource = ({
             const clientY = event.changedTouches[0].clientY;
             const inside = isInsideBounds(clientX, clientY);
             if (inside) {
-                console.log('drop touch...')
                 event.dropTarget = box.current;
                 batch(() => onDrop(event));
             }
@@ -188,7 +183,6 @@ const DnDSource = ({
         const element = box.current;
         const handleDragEndMouse = event => {
             if (!draggingBox.current) return;
-            console.log('drag end mouse...')
             batch(() => onDragEnd(event));
             draggingBox.current = false;
         }
