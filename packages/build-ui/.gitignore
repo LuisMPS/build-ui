@@ -1,6 +1,7 @@
 node_modules
 
 dist
+types
 compiled
 *.log
 coverage
