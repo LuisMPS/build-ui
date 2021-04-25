@@ -7,7 +7,6 @@ import Sketcher from "./Sketcher";
 
 const Sketch = ({
     initialTree,
-    initialMeta, 
     historyLimit = 99999,
     historyBatchTime = 3000,
     historyBatchTimeLimit = 6000,
@@ -27,9 +26,7 @@ const Sketch = ({
         historyBatchTime: historyBatchTime,
         historyBatchTimeLimit: historyBatchTimeLimit,
     });
-    const replacer = useReplacer({
-        initialMeta: initialMeta,
-    });
+    const replacer = useReplacer();
     const replaceTree = replacer.handleReplace;
     useIsomorphicLayoutEffect(() => {
         if (prepared || !tree) return;
@@ -62,11 +59,9 @@ const Sketch = ({
     }, [
         prepared
     ]);
-    return prepared && <div>
-        <Sketcher>
+    return prepared && <Sketcher>
         {children}
-        </Sketcher>
-    </div>
+    </Sketcher>
 }
 
 export default Sketch;

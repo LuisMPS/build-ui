@@ -6,7 +6,6 @@ import Sketch from './Sketch';
 
 const Builder = ({
     initialTree,
-    initialMeta,
     historyLimit,
     historyBatchTime,
     historyBatchTimeLimit,
@@ -30,7 +29,6 @@ const Builder = ({
     return <Provider store = {store}>
         <Sketch 
             initialTree = {initialTree}
-            initialMeta = {initialMeta}
             historyLimit = {historyLimit}
             historyBatchTime = {historyBatchTime}
             historyBatchTimeLimit = {historyBatchTimeLimit}
