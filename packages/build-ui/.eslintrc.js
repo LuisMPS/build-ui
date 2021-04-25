@@ -3,11 +3,6 @@ module.exports = {
         "browser": true,
         "es2021": true
     },
-    "extends": [
-        "eslint:recommended",
-        "plugin:react/recommended",
-        "plugin:react-hooks/recommended",
-    ],
     "parserOptions": {
         "ecmaFeatures": {
             "jsx": true
@@ -16,10 +11,31 @@ module.exports = {
         "sourceType": "module"
     },
     "plugins": [
-        "react"
+        "react",
+        "testing-library",
+        "jest-dom",
+    ],
+    "extends": [
+        "eslint:recommended",
+        "plugin:react/recommended",
+        "plugin:react-hooks/recommended",
+        "plugin:testing-library/react",
+        "plugin:jest-dom/recommended",
+        
     ],
     "rules": {
         "react/react-in-jsx-scope": "off",
         "react/prop-types": 0,
-    }
+    },
+    "overrides": [
+        {
+          "files": [
+            "**/*.test.js",
+            "**/*.test.jsx"
+          ],
+          "env": {
+            "jest": true
+          }
+        }
+    ]
 };
