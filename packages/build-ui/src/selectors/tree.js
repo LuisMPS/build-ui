@@ -11,6 +11,7 @@ import {keys, values} from '../utils/object';
  * value for 'tree'
 */
 
+const getTreeFromSlice = state => state.history.present;
 const getTreeFromHistory = state => state.present;
 
 // Direct selectors
@@ -107,6 +108,7 @@ const getMultipleIndexesForId = (state, ...id) => {
 
 export {
     // Misc. selectors
+    getTreeFromSlice,
     getTreeFromHistory,
     // Single node selectors
     getNodeById,
