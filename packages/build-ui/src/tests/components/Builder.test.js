@@ -4,7 +4,7 @@ import {useSelector} from 'react-redux';
 import {screen, render} from '@testing-library/react';
 import '@testing-library/jest-dom';
 
-import Builder from '../Builder';
+import Builder from '../../components/Builder';
 import {getTreeSlice} from '../../selectors';
 import {getTreeFromSlice} from '../../selectors/tree';
 import {branch, item} from '../../utils/tree';

@@ -3,8 +3,8 @@ import React from 'react';
 import {render} from '@testing-library/react';
 import '@testing-library/jest-dom';
 
-import Builder from '../Builder';
-import Workspace from '../Workspace';
+import Builder from '../../components/Builder';
+import Workspace from '../../components/Workspace';
 import {branch, item} from '../../utils/tree';
 
 const renderInsideBuilder = (ui, options = {}) => {

@@ -4,8 +4,8 @@ import {useDispatch} from 'react-redux';
 import {render, screen, fireEvent} from '@testing-library/react';
 import '@testing-library/jest-dom';
 
-import Builder from '../Builder';
-import DnDListener from '../DnDListener';
+import Builder from '../../components/Builder';
+import DnDListener from '../../components/DnDListener';
 import {startTransfer} from '../../slices/transfer';
 
 const DnDListenerTestComponent = ({

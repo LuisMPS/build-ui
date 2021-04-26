@@ -3,8 +3,8 @@ import React from 'react';
 import {render, screen, fireEvent} from '@testing-library/react';
 import '@testing-library/jest-dom';
 
-import Builder from '../Builder';
-import DnDBuilder from '../DnDBuilder';
+import Builder from '../../components/Builder';
+import DnDBuilder from '../../components/DnDBuilder';
 
 // All other tests concerting root 
 // DnDSource element and logic related

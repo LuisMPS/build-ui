@@ -4,8 +4,8 @@ import {useDispatch} from 'react-redux';
 import {render, screen, fireEvent} from '@testing-library/react';
 import '@testing-library/jest-dom';
 
-import Builder from '../Builder';
-import ChildrenDrop from '../ChildrenDrop';
+import Builder from '../../components/Builder';
+import ChildrenDrop from '../../components/ChildrenDrop';
 import {startTransfer} from '../../slices/transfer';
 
 const ChildrenDropTestComponent = ({

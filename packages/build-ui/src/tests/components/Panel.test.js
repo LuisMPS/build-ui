@@ -3,8 +3,8 @@ import React from 'react';
 import {render} from '@testing-library/react';
 import '@testing-library/jest-dom';
 
-import Builder from '../Builder';
-import Panel from '../Panel';
+import Builder from '../../components/Builder';
+import Panel from '../../components/Panel';
 import {branch, item} from '../../utils/tree';
 
 const renderInsideBuilder = (ui, options = {}) => {
