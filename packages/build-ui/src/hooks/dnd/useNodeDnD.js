@@ -237,17 +237,6 @@ const useNodeDnD = ({
     function handleDragEnd() {
         triggerDragEnd();
     }
-    function onChildDragOver(position) {
-        const handle = cb => (
-        event => {
-            const pos = getEventPosition(event);
-            const wasInPosition = pos[position];
-            if (wasInPosition) cb(event);
-        });
-        return {
-            handle: handle
-        }
-    }
     function getEventPosition(event) {
         const eventX = event.clientX;
         const eventY = event.clientY;
@@ -284,9 +273,6 @@ const useNodeDnD = ({
         triggerDragStart,
         triggerDragEnd,
     }
-    const listeners = {
-        onChildDragOver
-    }
     const utils = {
         dragDropBag,
         getEventPosition,
@@ -295,7 +281,6 @@ const useNodeDnD = ({
         ...dndBag,
         ...handlers,
         ...triggers,
-        ...listeners,
         ...utils,
     }
     return bag;
