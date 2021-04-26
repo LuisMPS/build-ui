@@ -4,20 +4,6 @@ import {useCreator, useDeleter} from "./useComposed";
 import {setIn} from "../utils/object";
 import useSketchContext from "./useSketchContext";
 
-// Modifications:
-//   1. Create
-//   2. Delete
-//   3. Move
-//   4. Intershift
-//   5. Update
-//   6. Rewrite
-//   7. Update Meta
-//   8. 
-//   9. 
-//   10. 
-//   11. 
-
-
 const useActions = () => {
     const dispatch = useDispatch();
     const context = useSketchContext();
