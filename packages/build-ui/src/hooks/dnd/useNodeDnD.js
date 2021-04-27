@@ -238,8 +238,16 @@ const useNodeDnD = ({
         triggerDragEnd();
     }
     function getEventPosition(event) {
-        const eventX = event.clientX;
-        const eventY = event.clientY;
+        const eventX = (
+            event.clientX ||
+            event.touces &&  
+            event.touches[0].clientX
+        );
+        const eventY = (
+            event.clientY || 
+            event.touces &&
+            event.touches[0].clientY
+        );
         const target = event.currentTarget;
         const {
             top, height,
