@@ -1,5 +1,5 @@
 import {useDispatch} from "react-redux";
-import {moveNode, intershiftNode, updateNode, rewriteNode, updateMeta, removeIndex, removeListIndex, addIndex, addListIndex, toggleIndex, toggleListIndex} from "../slices/tree";
+import {moveNode, intershiftNode, updateNode, rewriteNode, updateMeta, removeIndex, removeListIndex, addIndex, addListIndex, toggleIndex, toggleListIndex, clearIndex, clearListIndex} from "../slices/tree";
 import {useCreator, useDeleter} from "./useComposed";
 import {setIn} from "../utils/object";
 import useSketchContext from "./useSketchContext";
@@ -125,13 +125,13 @@ const useActions = () => {
         batcher.refresh();
     }
     function triggerIndexClear(clear) {
-        dispatch(removeIndex({
+        dispatch(clearIndex({
             name: clear.name
         }));
         batcher.refresh();
     }
     function triggerListIndexClear(clear) {
-        dispatch(removeListIndex({
+        dispatch(clearListIndex({
             name: clear.name
         }));
         batcher.refresh();
