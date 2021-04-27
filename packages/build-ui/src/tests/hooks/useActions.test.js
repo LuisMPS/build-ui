@@ -112,18 +112,29 @@ describe('useActions', () => {
         const actions_1 = screen.getByTestId('actions_1');
         fireEvent.click(actions_1);
         expect(getTree().index.outlined).toBe(id_1);
-        expect(getTree().index_list.selected).toContain(id_1);
         const actions_2 = screen.getByTestId('actions_2');
         fireEvent.click(actions_2);
         expect(getTree().index.outlined).toBe(id_2);
-        expect(getTree().index_list.selected).toContain(id_2);
         fireEvent.click(document);
         expect(getTree().index.outlined).toBeFalsy();
-        expect(getTree().index_list.selected.length).toBe(0);
     });
 
     test('should trigger index list clear', () => {
-        
+        const onTree = jest.fn();
+        render(<Builder initialTree = {initialTree}>
+            <Workspace view = {view} />
+            <ActionsDocumentComponent />
+            <TreeTestComponent onTree = {onTree} />
+        </Builder>);      
+        const getTree = () => onTree.mock.calls[onTree.mock.calls.length - 1][0]
+        const actions_1 = screen.getByTestId('actions_1');
+        fireEvent.click(actions_1);
+        expect(getTree().index_list.selected).toContain(id_1);
+        const actions_2 = screen.getByTestId('actions_2');
+        fireEvent.click(actions_2);
+        expect(getTree().index_list.selected).toContain(id_2);
+        fireEvent.click(document);
+        expect(getTree().index_list.selected.length).toBe(0);
     });
 
 
