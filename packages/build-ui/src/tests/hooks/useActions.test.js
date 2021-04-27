@@ -33,12 +33,18 @@ const ActionsHookTestComponent = ({
 
 const ActionsDocumentComponent = () => {
     const actions = useActions();
+    const triggerIndexClear = (
+        actions.triggerIndexClear
+    );
+    const triggerListIndexClear = (
+        actions.triggerListIndexClear
+    );
     useEffect(() => {
         const handleDeselect = () => {
-            actions.triggerListIndexClear({
+            triggerListIndexClear({
                 name: 'selected'
             });
-            actions.triggerIndexClear({
+            triggerIndexClear({
                 name: 'outlined'
             })
         }
@@ -53,8 +59,8 @@ const ActionsDocumentComponent = () => {
             );
         }
     }, [
-        actions.triggerListIndexClear,
-        actions.triggerIndexClear,
+        triggerListIndexClear,
+        triggerIndexClear,
     ]);
     return null;
 }

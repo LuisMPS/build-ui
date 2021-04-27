@@ -17,6 +17,7 @@ const EditorHookDnDTestComponent = ({
     builder_testid,
     drop_testid,
     horizontal,
+    children = [],
     ...props
 }) => {
     const initialOnDrop = ({
@@ -42,11 +43,12 @@ const EditorHookDnDTestComponent = ({
         data-testid = {builder_testid}
     >
         <ChildrenDrop 
-            children = {[]}
             {...props} 
             onDrop = {handleChildDrop}
             data-testid = {drop_testid}
-        />
+        >
+            {children}
+        </ChildrenDrop>
     </DnDBuilder>
 }
 
