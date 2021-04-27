@@ -17,7 +17,7 @@ import useMultiCollector from './hooks/collectors/useMultiCollector'
 import useNodeDnD from './hooks/dnd/useNodeDnD';
 import useToolDnD from './hooks/dnd/useToolDnD';
 
-import {branch, item} from './utils/tree'
+import {branch, item, itemid} from './utils/tree'
 
 export {
     Builder,
@@ -36,5 +36,6 @@ export {
     useToolDnD,
     branch,
     item,
+    itemid,
 }
 

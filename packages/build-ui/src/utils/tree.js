@@ -25,7 +25,7 @@ class Item {
         this.detail = detail;
         this.meta = meta || {};
         this.indexes = indexes || [];
-        this.indexes_list = indexes_list || []; 
+        this.indexes_list = indexes_list || [];
     }
     with_meta(meta) {
         return new Item(
@@ -158,7 +158,9 @@ export function normalizeBranch(branch) {
 }
 
 export function normalizeItem(item) {
-    const id = nanoid();
+    const auto_id = nanoid();
+    const forced_id = item.detail.__id__;
+    const id = forced_id || auto_id;
     const node = {
         id: id,
         type: item.detail.type || null,
@@ -184,3 +186,5 @@ export function normalizeItem(item) {
         index_list: index_list,
     }
 }
+
+export {nanoid as itemid};
