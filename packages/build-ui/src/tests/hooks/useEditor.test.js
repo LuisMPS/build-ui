@@ -2,7 +2,7 @@ import React from 'react';
 
 import {screen, render, fireEvent, createEvent} from '@testing-library/react';
 import '@testing-library/jest-dom';
-import {HookTestComponent} from './test-components';
+import {TreeTestComponent, ViewTestComponent} from './test-components';
 
 import Builder from '../../components/Builder';
 import DnDBuilder from '../../components/DnDBuilder';
@@ -181,13 +181,6 @@ const EditorHookUtilTestComponent = ({
     </div>
 }
 
-const ViewTestComponent = ({
-    id,
-    ...props
-}) => {
-    return <div {...props} />
-}
-
 beforeAll(() => {
     jest.useFakeTimers();
 })
@@ -297,7 +290,7 @@ describe('useEditor', () => {
             const onTree = jest.fn();
             render(<Builder initialTree = {initialTree}>
                 <Workspace view = {view} />
-                <HookTestComponent onTree = {onTree} />
+                <TreeTestComponent onTree = {onTree} />
             </Builder>);      
             const getTree = () => onTree.mock.calls[onTree.mock.calls.length - 1][0]
             const builder_1 = screen.getByTestId('builder_1');
@@ -313,7 +306,7 @@ describe('useEditor', () => {
             const onTree = jest.fn();
             render(<Builder initialTree = {initialTree}>
                 <Workspace view = {view} />
-                <HookTestComponent onTree = {onTree} />
+                <TreeTestComponent onTree = {onTree} />
             </Builder>);      
             const getTree = () => onTree.mock.calls[onTree.mock.calls.length - 1][0]
             const builder_1 = screen.getByTestId('builder_1');
@@ -329,7 +322,7 @@ describe('useEditor', () => {
             const onTree = jest.fn();
             render(<Builder initialTree = {initialTree}>
                 <Workspace view = {view} />
-                <HookTestComponent onTree = {onTree} />
+                <TreeTestComponent onTree = {onTree} />
             </Builder>);      
             const getTree = () => onTree.mock.calls[onTree.mock.calls.length - 1][0]
             const builder_drop = screen.getByTestId('drop_1');
@@ -358,7 +351,7 @@ describe('useEditor', () => {
             const onTree = jest.fn();
             render(<Builder initialTree = {initialTree}>
                 <Workspace view = {view} />
-                <HookTestComponent onTree = {onTree} />
+                <TreeTestComponent onTree = {onTree} />
             </Builder>);      
             const getTree = () => onTree.mock.calls[onTree.mock.calls.length - 1][0]
             const builder_drop = screen.getByTestId('drop_2');
@@ -387,7 +380,7 @@ describe('useEditor', () => {
             const onTree = jest.fn();
             render(<Builder initialTree = {initialTree}>
                 <Workspace view = {view} />
-                <HookTestComponent onTree = {onTree} />
+                <TreeTestComponent onTree = {onTree} />
             </Builder>);      
             const getTree = () => onTree.mock.calls[onTree.mock.calls.length - 1][0]
             const builder = screen.getByTestId('builder_1');
@@ -443,7 +436,7 @@ describe('useEditor', () => {
             const onTree = jest.fn();
             render(<Builder initialTree = {initialTree}>
                 <Workspace view = {view} />
-                <HookTestComponent onTree = {onTree} />
+                <TreeTestComponent onTree = {onTree} />
             </Builder>);      
             const getTree = () => onTree.mock.calls[onTree.mock.calls.length - 1][0]
             const button = screen.getByRole('button', {name: /append/i});
@@ -456,7 +449,7 @@ describe('useEditor', () => {
             const onTree = jest.fn();
             render(<Builder initialTree = {initialTree}>
                 <Workspace view = {view} />
-                <HookTestComponent onTree = {onTree} />
+                <TreeTestComponent onTree = {onTree} />
             </Builder>);      
             const getTree = () => onTree.mock.calls[onTree.mock.calls.length - 1][0]
             const button = screen.getByRole('button', {name: /move to root/i});
@@ -469,7 +462,7 @@ describe('useEditor', () => {
             const onTree = jest.fn();
             render(<Builder initialTree = {initialTree}>
                 <Workspace view = {view} />
-                <HookTestComponent onTree = {onTree} />
+                <TreeTestComponent onTree = {onTree} />
             </Builder>);      
             const getTree = () => onTree.mock.calls[onTree.mock.calls.length - 1][0]
             const button = screen.getByRole('button', {name: /send to front/i});
@@ -484,7 +477,7 @@ describe('useEditor', () => {
             const onTree = jest.fn();
             render(<Builder initialTree = {initialTree}>
                 <Workspace view = {view} />
-                <HookTestComponent onTree = {onTree} />
+                <TreeTestComponent onTree = {onTree} />
             </Builder>);      
             const getTree = () => onTree.mock.calls[onTree.mock.calls.length - 1][0]
             const button = screen.getByRole('button', {name: /delete/i});
@@ -499,7 +492,7 @@ describe('useEditor', () => {
             const onTree = jest.fn();
             render(<Builder initialTree = {initialTree}>
                 <Workspace view = {view} />
-                <HookTestComponent onTree = {onTree} />
+                <TreeTestComponent onTree = {onTree} />
             </Builder>);      
             const getTree = () => onTree.mock.calls[onTree.mock.calls.length - 1][0]
             const button = screen.getByRole('button', {name: /reset/i});
@@ -511,7 +504,7 @@ describe('useEditor', () => {
             const onTree = jest.fn();
             render(<Builder initialTree = {initialTree}>
                 <Workspace view = {view} />
-                <HookTestComponent onTree = {onTree} />
+                <TreeTestComponent onTree = {onTree} />
             </Builder>);      
             const getTree = () => onTree.mock.calls[onTree.mock.calls.length - 1][0]
             const button = screen.getByRole('button', {name: /fix/i});
@@ -523,7 +516,7 @@ describe('useEditor', () => {
             const onTree = jest.fn();
             render(<Builder initialTree = {initialTree}>
                 <Workspace view = {view} />
-                <HookTestComponent onTree = {onTree} />
+                <TreeTestComponent onTree = {onTree} />
             </Builder>);      
             const getTree = () => onTree.mock.calls[onTree.mock.calls.length - 1][0]
             const editor = screen.getByTestId('editor');
@@ -538,7 +531,7 @@ describe('useEditor', () => {
             const onTree = jest.fn();
             render(<Builder initialTree = {initialTree}>
                 <Workspace view = {view} />
-                <HookTestComponent onTree = {onTree} />
+                <TreeTestComponent onTree = {onTree} />
             </Builder>);      
             const getTree = () => onTree.mock.calls[onTree.mock.calls.length - 1][0]
             const button = screen.getByRole('button', {name: /outline/i});
@@ -553,7 +546,7 @@ describe('useEditor', () => {
             const onTree = jest.fn();
             render(<Builder initialTree = {initialTree}>
                 <Workspace view = {view} />
-                <HookTestComponent onTree = {onTree} />
+                <TreeTestComponent onTree = {onTree} />
             </Builder>);      
             const getTree = () => onTree.mock.calls[onTree.mock.calls.length - 1][0]
             const button_reset = screen.getByRole('button', {name: /reset/i});
@@ -569,7 +562,7 @@ describe('useEditor', () => {
             const onTree = jest.fn();
             render(<Builder initialTree = {initialTree}>
                 <Workspace view = {view} />
-                <HookTestComponent onTree = {onTree} />
+                <TreeTestComponent onTree = {onTree} />
             </Builder>);      
             const getTree = () => onTree.mock.calls[onTree.mock.calls.length - 1][0]
             const editor = screen.getByTestId('editor');
@@ -605,7 +598,7 @@ describe('useEditor', () => {
             const onTree = jest.fn();
             render(<Builder initialTree = {initialTree}>
                 <Workspace view = {view} />
-                <HookTestComponent onTree = {onTree} />
+                <TreeTestComponent onTree = {onTree} />
             </Builder>);      
             const getTree = () => onTree.mock.calls[onTree.mock.calls.length - 1][0]
             const input = screen.getByLabelText(/text/i);
@@ -617,7 +610,7 @@ describe('useEditor', () => {
             const onTree = jest.fn();
             render(<Builder initialTree = {initialTree}>
                 <Workspace view = {view} />
-                <HookTestComponent onTree = {onTree} />
+                <TreeTestComponent onTree = {onTree} />
             </Builder>);      
             const getTree = () => onTree.mock.calls[onTree.mock.calls.length - 1][0]
             const input = screen.getByLabelText(/number/i);
@@ -629,7 +622,7 @@ describe('useEditor', () => {
             const onTree = jest.fn();
             render(<Builder initialTree = {initialTree}>
                 <Workspace view = {view} />
-                <HookTestComponent onTree = {onTree} />
+                <TreeTestComponent onTree = {onTree} />
             </Builder>);      
             const getTree = () => onTree.mock.calls[onTree.mock.calls.length - 1][0]
             const editor = screen.getByTestId('editor');

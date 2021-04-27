@@ -1,9 +1,9 @@
-import {useEffect} from 'react';
+import React, {useEffect} from 'react';
 
 import useBuilder from '../../hooks/useBuilder';
 
-const HookTestComponent = ({
-    onTree= () => {},
+const TreeTestComponent = ({
+    onTree = () => {},
 }) => {
     const builder = useBuilder();
     const tree = builder.json();
@@ -16,4 +16,11 @@ const HookTestComponent = ({
     return null;
 }
 
-export {HookTestComponent};
+const ViewTestComponent = ({
+    id,
+    ...props
+}) => {
+    return <div {...props} />
+}
+
+export {TreeTestComponent, ViewTestComponent};
