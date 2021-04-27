@@ -1,9 +1,8 @@
 function addListIndex(state, action) {
     const {id, name} = action.payload;
-    const past = state.index_list[name];
     // State mutations
-    if (past) state.index_list[name].push(id);
-    if (!past) state.index_list[name] = [id];
+    state.index_list[name] = state.index_list[name] || [];
+    state.index_list[name].push(id);
 }
 
 const reducer = {
