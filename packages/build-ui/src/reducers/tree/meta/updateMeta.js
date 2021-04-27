@@ -1,10 +1,10 @@
 function updateMeta(state, action) {
     const {
         id,
-        props = {}
+        meta = {}
     } = action.payload;
     // State mutations
-    Object.entries(props).map(([prop, value]) => {
+    Object.entries(meta).map(([prop, value]) => {
         state.meta[id][prop] = value;
     });
 }

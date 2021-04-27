@@ -69,16 +69,16 @@ const useActions = () => {
         batcher.refresh();
     }
     function triggerMetaUpdate(update) {
-        const props = update.props;
-        const _props = Object.keys(props)
+        const meta = update.meta;
+        const _meta = Object.keys(meta)
         .reduce((update, prop) => setIn(
             update, 
             prop, 
-            props[prop]
+            meta[prop]
         ), {});
         dispatch(updateMeta({
             id: update.id,
-            props: _props,
+            meta: _meta,
         }));
         batcher.refresh();
     }
