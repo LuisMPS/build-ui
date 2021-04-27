@@ -25,7 +25,7 @@ const useEditor = ({
     function triggerCreate(create) {
         actions.triggerCreate({
             ...create,
-            id: id,
+            targetId: id,
         });
     }
     function triggerDelete() {
