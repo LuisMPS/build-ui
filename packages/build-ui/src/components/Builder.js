@@ -1,4 +1,4 @@
-import {configureStore} from '@reduxjs/toolkit';
+import {configureStore, getDefaultMiddleware} from '@reduxjs/toolkit';
 import React, {useState} from 'react';
 import {Provider} from 'react-redux';
 import rootReducer from '../slices';
@@ -9,6 +9,7 @@ const Builder = ({
     historyLimit,
     historyBatchTime,
     historyBatchTimeLimit,
+    serializable = true,
     children,
 }) => {
     // Builder component will most likely
@@ -24,6 +25,14 @@ const Builder = ({
     // cannot share any state between them.
     const initialStore = () => configureStore({
         reducer: rootReducer,
+        // Allow non-serializable data
+        // to be passed down to view
+        // components, such as functions.
+        // Trade-offs include time-traveling
+        // debug problems.
+        middleware: getDefaultMiddleware({
+            serializableCheck: serializable,
+        }),
     });
     const [store] = useState(initialStore);
     return <Provider store = {store}>
