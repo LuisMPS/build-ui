@@ -1,5 +1,5 @@
 import useDnD from "./useDnD";
-import {isBranch, normalizeBranch} from "../../utils/tree";
+import {plainBranch} from "../../utils/tree";
 
 const useToolDnD = ({
     initialTransferType,
@@ -15,9 +15,7 @@ const useToolDnD = ({
         dnd.setTransferType
     );
     function triggerDragStart(drag) {
-        const data = isBranch(drag.data) 
-            ? normalizeBranch(drag.data) 
-            : drag.data;
+        const data = plainBranch(drag.data);
         dnd.triggerDragStartCreate({
             data: data,
             meta: drag.meta,

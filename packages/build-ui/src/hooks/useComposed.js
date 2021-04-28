@@ -1,15 +1,13 @@
 import {useDispatch} from "react-redux";
 import {createNode, deleteNode,  replaceTree, createMeta, deleteMeta, createIndex, deleteIndex} from "../slices/tree";
-import {isBranch, normalizeBranch} from "../utils/tree";
+import {plainBranch} from "../utils/tree";
 
 const useCreator = () => {
     const dispatch = useDispatch();
     const meta = useMeta();
     function handleCreate(creation) {
         const branch = creation.node;
-        const node = isBranch(branch) 
-            ? normalizeBranch(branch)
-            : branch;
+        const node = plainBranch(branch);
         dispatch(createNode({
             node: node,
             targetId: creation.targetId,
@@ -72,9 +70,7 @@ const useReplacer = () => {
     const dispatch = useDispatch();
     function handleReplace(replace) {
         const branch = replace.tree;
-        const tree = isBranch(branch) 
-            ? normalizeBranch(branch)
-            : branch;
+        const tree = plainBranch(branch);
         dispatch(replaceTree({
             tree: tree,
         }));

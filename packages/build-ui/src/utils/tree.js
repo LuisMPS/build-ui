@@ -187,4 +187,8 @@ export function normalizeItem(item) {
     }
 }
 
+export function plainBranch(branch) {
+    return isBranch(branch) ? normalizeBranch(branch) : branch
+}
+
 export {nanoid as itemid};
