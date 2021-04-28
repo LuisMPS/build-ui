@@ -7,7 +7,7 @@ import '@testing-library/jest-dom';
 import Builder from '../../components/Builder';
 import {getTreeSlice} from '../../selectors';
 import {getTreeFromSlice} from '../../selectors/tree';
-import {branch, item} from '../../utils/tree';
+import {branch, plainBranch, item, itemid} from '../../utils/tree';
 
 const BuilderTestComponent = ({
     onTree = () => {},
@@ -50,23 +50,16 @@ describe('<Builder />', () => {
         }
         const handleTree = jest.fn();
         render(<Builder>
-            <BuilderTestComponent 
-                onTree = {handleTree}
-            />
+            <BuilderTestComponent onTree = {handleTree} />
         </Builder>);
-        expect(handleTree).toHaveBeenLastCalledWith(
-            expect.objectContaining({
-                ...defaultTree,
-            })
-        );
+        const getTree = () => handleTree.mock.calls[handleTree.mock.calls.length - 1][0]
+        expect(getTree()).toEqual(defaultTree);
     });
 
     test('should initialize default history configuration', () => {
         const handleHistoryConfigure = jest.fn();
         render(<Builder>
-            <BuilderTestComponent 
-                onHistoryConfigure = {handleHistoryConfigure}
-            />
+            <BuilderTestComponent onHistoryConfigure = {handleHistoryConfigure} />
         </Builder>);
         expect(handleHistoryConfigure).toHaveBeenLastCalledWith(
             expect.objectContaining({
@@ -78,9 +71,7 @@ describe('<Builder />', () => {
     test('should initialize default batch configuration', () => {
         const handleBatchConfigure = jest.fn();
         render(<Builder>
-            <BuilderTestComponent 
-                onBatchConfigure = {handleBatchConfigure}
-            />
+            <BuilderTestComponent onBatchConfigure = {handleBatchConfigure} />
         </Builder>);
         expect(handleBatchConfigure).toHaveBeenLastCalledWith(
             expect.objectContaining({
@@ -91,23 +82,20 @@ describe('<Builder />', () => {
     });
 
     test('should initialize passed tree', () => {
+        const id = itemid();
         const tree = branch(
             item({
+                __id__: id,
                 type: 'Any',
                 props: {}
             })
         );
         const handleTree = jest.fn();
         render(<Builder initialTree = {tree}>
-            <BuilderTestComponent 
-                onTree = {handleTree}
-            />
+            <BuilderTestComponent onTree = {handleTree} />
         </Builder>);
-        expect(handleTree).toHaveBeenLastCalledWith(
-            expect.objectContaining({
-                root: expect.any(String),
-            })
-        );
+        const getTree = () => handleTree.mock.calls[handleTree.mock.calls.length - 1][0]
+        expect(getTree()).toEqual(plainBranch(tree));
     });
 
     test('should initialize passed history configuration', () => {

@@ -7,8 +7,10 @@ import Builder from '../../components/Builder';
 import Panel from '../../components/Panel';
 import {branch, item} from '../../utils/tree';
 
-const renderInsideBuilder = (ui, options = {}) => {
-    const tree = branch(
+
+describe('<Panel />', () => {
+
+    const initialTree = branch(
         item({
             type: 'Type_1',
         })
@@ -29,17 +31,8 @@ const renderInsideBuilder = (ui, options = {}) => {
                 type: 'Type_2',
             })
         )
-    )
-    return render(
-        <Builder initialTree = {tree}>
-            {ui}
-        </Builder>,
-        {...options}
-    );      
-}
-  
+    );
 
-describe('<Panel />', () => {
 
     describe('should throw errors', () => {
 
@@ -60,10 +53,14 @@ describe('<Panel />', () => {
     
         test('should throw error when view prop has no properties', () => {
             expect(() => {
-                renderInsideBuilder(<Panel />);
+                render(<Builder initialTree = {initialTree}>
+                    <Panel />
+                </Builder>);
             }).toThrowError();
             expect(() => {
-                renderInsideBuilder(<Panel view = {null} />);
+                render(<Builder initialTree = {initialTree}>
+                    <Panel view = {null} />
+                </Builder>);
             }).toThrowError();
         });
 
@@ -72,14 +69,18 @@ describe('<Panel />', () => {
     test('should render view component when there is a view type match', () => {
         const Component = jest.fn(props => <div {...props} />);
         const view = {Type_1: Component}
-        renderInsideBuilder(<Panel view = {view} />);
+        render(<Builder initialTree = {initialTree}>
+            <Panel view = {view} />
+        </Builder>);
         expect(Component).toHaveBeenCalledTimes(1);
     });
 
     test('should not render anything when there is not a view type match', () => {
         const Component = jest.fn(props => <div {...props} />);
         const view = {Type_2: Component}
-        const {container} = renderInsideBuilder(<Panel view = {view} />);
+        const {container} = render(<Builder initialTree = {initialTree}>
+            <Panel view = {view} />
+        </Builder>);
         expect(container).toBeEmptyDOMElement();
     });
 

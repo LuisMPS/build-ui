@@ -7,8 +7,9 @@ import Builder from '../../components/Builder';
 import Workspace from '../../components/Workspace';
 import {branch, item} from '../../utils/tree';
 
-const renderInsideBuilder = (ui, options = {}) => {
-    const tree = branch(
+describe('<Workspace />', () => {
+
+    const initialTree = branch(
         item({
             type: 'Type_1',
         })
@@ -26,16 +27,7 @@ const renderInsideBuilder = (ui, options = {}) => {
                 type: 'Type_2',
             })
         )
-    )
-    return render(
-        <Builder initialTree = {tree}>
-            {ui}
-        </Builder>,
-        {...options}
-    );      
-}
-
-describe('<Workspace />', () => {
+    );
 
     describe('should throw errors', () => {
 
@@ -56,10 +48,14 @@ describe('<Workspace />', () => {
     
         test('should throw error when view prop has no properties', () => {
             expect(() => {
-                renderInsideBuilder(<Workspace />);
+                render(<Builder initialTree = {initialTree}>
+                    <Workspace />
+                </Builder>);
             }).toThrowError();
             expect(() => {
-                renderInsideBuilder(<Workspace view = {null} />);
+                render(<Builder initialTree = {initialTree}>
+                    <Workspace view = {null} />
+                </Builder>);
             }).toThrowError();
         });
 
@@ -71,7 +67,9 @@ describe('<Workspace />', () => {
             Type_2: jest.fn(props => <div {...props} />), 
             Type_3: jest.fn(props => <div {...props} />),
         };
-        renderInsideBuilder(<Workspace view = {view} />);
+        render(<Builder initialTree = {initialTree}>
+            <Workspace view = {view} />
+        </Builder>);
         expect(view.Type_1).toHaveBeenCalledTimes(1);
         expect(view.Type_2).toHaveBeenCalledTimes(2);
         expect(view.Type_3).toHaveBeenCalledTimes(1);
@@ -83,14 +81,18 @@ describe('<Workspace />', () => {
             Type_2: jest.fn(props => <div {...props} />), 
             Type_4: jest.fn(props => <div {...props} />),
         };
-        renderInsideBuilder(<Workspace view = {view} />);
+        render(<Builder initialTree = {initialTree}>
+            <Workspace view = {view} />
+        </Builder>);
         expect(view.Type_1).toHaveBeenCalledTimes(1);
         expect(view.Type_2).toHaveBeenCalledTimes(1);
         expect(view.Type_4).toHaveBeenCalledTimes(0);
     });
 
     test('should not render anything when there is not a root type match', () => {
-        const {container} = renderInsideBuilder(<Workspace view = {{}} />);
+        const {container} = render(<Builder initialTree = {initialTree}>
+            <Workspace view = {{}} />
+        </Builder>);
         expect(container).toBeEmptyDOMElement();
     });
 
