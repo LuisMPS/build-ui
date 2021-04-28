@@ -50,7 +50,7 @@ const useTimer = ({
     const refresh = useCallback(() => {
         const running = timer.running;
         if (running) update();
-        else if (!running) start();
+        else start();
     }, [
         timer,
         update,
