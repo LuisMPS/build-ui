@@ -14,23 +14,21 @@ import {branch, item, itemid} from '../../utils/tree';
 const ToolsHookTestComponent = () => {
     const tools = useTools();
     const handleDragAccept = () => {
-        const data = branch(
-            item({
-                type: 'Any',
-                props: {'data-testid': 'tool-accepted'},
-            })
-        );
+        const root = item({
+            type: 'Any',
+            props: {'data-testid': 'tool-accepted'},
+        });
+        const data = branch(root);
         tools.triggerDragStart({
             data: data,
         });
     }
     const handleDragReject = () => {
-        const data = branch(
-            item({
-                type: 'Cancel',
-                props: {'data-testid': 'tool-rejected'},
-            })
-        );
+        const root = item({
+            type: 'Cancel',
+            props: {'data-testid': 'tool-rejected'},
+        });
+        const data = branch(root);
         tools.triggerDragStart({
             data: data,
         });
