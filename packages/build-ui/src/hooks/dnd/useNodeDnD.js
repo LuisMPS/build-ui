@@ -240,13 +240,17 @@ const useNodeDnD = ({
     function getEventPosition(event) {
         const eventX = (
             event.clientX ||
-            event.touces &&  
-            event.touches[0].clientX
+            (event.changedTouches &&  
+            event.changedTouches[0].clientX) ||
+            (event.touces &&  
+            event.touches[0].clientX)
         );
         const eventY = (
             event.clientY || 
-            event.touces &&
-            event.touches[0].clientY
+            (event.changedTouches &&  
+            event.changedTouches[0].clientY) ||
+            (event.touces &&
+            event.touches[0].clientY)
         );
         const target = event.currentTarget;
         const {
