@@ -79,7 +79,7 @@ const useNodeDnD = ({
             cancel: cancel,
         }
     }
-    function dragDropBag() {
+    function getDragAndDrop() {
         const data = getTransferData(transfer);
         // In case drop is not
         // caused by an internal
@@ -90,28 +90,28 @@ const useNodeDnD = ({
         if (!data) return null;
         const meta = getTransferMeta(transfer);
         const create = meta.create;
-        if (create) return dragDropBagCreate();
-        if (!create) return dragDropBagMove();
+        if (create) return getDragAndDropCreate();
+        if (!create) return getDragAndDropMove();
     }
-    function dragDropBagCreate() {
+    function getDragAndDropCreate() {
         const data = getTransferData(transfer);
         const meta = getTransferMeta(transfer);
         const rootId = data.root;
         const root = data.byIds[rootId];
-        const dragDropBag = {
+        const bagDnD = {
             transfer: root,
             meta: meta,
         }
-        return dragDropBag;
+        return bagDnD;
     }
-    function dragDropBagMove() {
+    function getDragAndDropMove() {
         const moved = getTransferData(transfer);
         const meta = getTransferMeta(transfer);
-        const dragDropBag = {
+        const bagDnD = {
             transfer: moved,
             meta: meta,
         }
-        return dragDropBag;
+        return bagDnD;
     }
     function handleDrop(event, position = null) {
         const data = getTransferData(transfer);
@@ -133,7 +133,7 @@ const useNodeDnD = ({
         };
         const dropBag = {
             event: event,
-            ...dragDropBag(),
+            ...getDragAndDrop(),
         }
         const onDropBag = {
             cancelled: drop.cancelled,
@@ -182,7 +182,7 @@ const useNodeDnD = ({
         };
         const dropBag = {
             event: event,
-            ...dragDropBag(),
+            ...getDragAndDrop(),
         }
         const onDropBag = {
             cancelled: drop.cancelled,
@@ -286,7 +286,7 @@ const useNodeDnD = ({
         triggerDragEnd,
     }
     const utils = {
-        dragDropBag,
+        getDragAndDrop,
         getEventPosition,
     }
     const bag = {
