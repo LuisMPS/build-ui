@@ -1,8 +1,8 @@
 import {combineReducers} from '@reduxjs/toolkit';
-import treeReducer from './tree';
-import transferReducer from './transfer';
+import tree from './tree';
+import transfer from './transfer';
 
 export default combineReducers({
-    tree: treeReducer,
-    transfer: transferReducer,
-})
+    tree: tree.reducer,
+    transfer: transfer.reducer,
+});

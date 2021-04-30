@@ -21,13 +21,13 @@ const transfer = createSlice({
     reducers: reducers,
 });
 
-const reducer = transfer.reducer;
 const {
     startTransfer,
     endTransfer,
 } = transfer.actions;
 
-export default reducer;
+export default transfer;
+
 export {
     startTransfer,
     endTransfer

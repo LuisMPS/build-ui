@@ -58,7 +58,10 @@ const tree = createVersionedSlice({
 });
 
 const batched = tree.extraActions.batched;
+// Yet to implement.
 const unbatched = tree.extraActions.unbatched;
+const unrecorded = tree.extraActions.unrecorded;
+
 const actions = tree.actions;
 
 const {
@@ -84,7 +87,10 @@ const {
 } = batched;
 
 const {
-    replaceTree,
+    replaceTree
+} = unrecorded;
+
+const {
     undoHistory,
     redoHistory,
     restartHistory,
@@ -94,9 +100,8 @@ const {
     configureBatchHistory,
 } = actions;
 
-const treeReducer = tree.reducer;
+export default tree;
 
-export default treeReducer;
 export {
     createNode,
     deleteNode, 
