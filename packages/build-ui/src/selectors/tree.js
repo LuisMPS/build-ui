@@ -20,7 +20,10 @@ const getNodeById = (state, id) => state.byIds[id];
 const getNodeByFilter = (state, filter) => values(state.byIds).find(filter);
 const getNodeByIndex = (state, index) => state.byIds[state.index[index]];
 const getRootNode = state => getNodeById(state, state.root);
-const getParentNode = (state, id) => getNodeById(state, getNodeById(state, id).parentId);
+const getParentNode = (state, id) => getNodeById(state, 
+    getNodeById(state, id) && 
+    getNodeById(state, id).parentId
+);
 
 const getMetaById = (state, id) => state.meta[id];
 
