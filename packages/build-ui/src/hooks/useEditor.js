@@ -14,7 +14,10 @@ const useEditor = ({
     const collected = useCollector({
         selector: nodeSelector,
     });
-    const props = collected.node.props;
+    const props = (
+        collected.node && 
+        collected.node.props
+    );
     const dnd = useNodeDnD({
         initialTransferType: 'builder',
         initialOnDrop: initialOnDrop,

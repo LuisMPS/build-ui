@@ -219,13 +219,13 @@ const useNodeDnD = ({
         onDropDone(dropBag);
     }
     function handleChildYDrop(event, position) {
-        const {top} = getEventPosition(event);
+        const {top} = getDnDEventPosition(event);
         const offset = top ? 0 : 1;
         const dropPosition = position + offset;
         handleDrop(event, dropPosition);
     }
     function handleChildXDrop(event, position) {
-        const {left} = getEventPosition(event);
+        const {left} = getDnDEventPosition(event);
         const offset = left ? 0 : 1;
         const dropPosition = position + offset;
         handleDrop(event, dropPosition);
@@ -237,7 +237,17 @@ const useNodeDnD = ({
     function handleDragEnd() {
         triggerDragEnd();
     }
-    function getEventPosition(event) {
+    function getDnDEventPosition(event) {
+        // In case event target is not 
+        // an HTMLElement, must watch for
+        // event target, since position
+        // will be calculated with 
+        // getBoundingClientRect function. 
+        const getDnDEventTarget = event => (
+            event.currentTarget === document 
+            ? event.target
+            : event.currentTarget
+        );
         const eventX = (
             event.clientX ||
             (event.changedTouches &&  
@@ -252,7 +262,7 @@ const useNodeDnD = ({
             (event.touces &&
             event.touches[0].clientY)
         );
-        const target = event.currentTarget;
+        const target = getDnDEventTarget(event);
         const {
             top, height,
             left, width,
@@ -266,6 +276,13 @@ const useNodeDnD = ({
             right: centerX <= eventX,
         }
     }
+    const isTransfering = Boolean(
+        transfer.data
+    );
+    const isTransferingType = (
+        isTransfering && 
+        transfer.type === transferType
+    );
     const dndBag = {
         transferType: transferType,
         onDrop: onDrop,
@@ -286,8 +303,9 @@ const useNodeDnD = ({
         triggerDragEnd,
     }
     const utils = {
-        getDragAndDrop,
-        getEventPosition,
+        getDnDEventPosition,
+        isTransfering: isTransfering,
+        isTransferingType: isTransferingType,
     }
     const bag = {
         ...dndBag,
