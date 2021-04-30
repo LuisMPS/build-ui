@@ -1,6 +1,7 @@
 import React from 'react';
 
 import {screen, render, fireEvent, createEvent} from '@testing-library/react';
+import {renderHook, act} from '@testing-library/react-hooks';
 import '@testing-library/jest-dom';
 import {TreeTestComponent, ViewTestComponent} from './test-components';
 
@@ -9,7 +10,6 @@ import DnDBuilder from '../../components/DnDBuilder';
 import Workspace from '../../components/Workspace';
 import ChildrenDrop from '../../components/ChildrenDrop';
 import useEditor from '../../hooks/useEditor';
-import useCollector from '../../hooks/collectors/useCollector';
 import {branch, item, itemid} from '../../utils/tree';
 
 const EditorHookDnDTestComponent = ({
@@ -58,75 +58,9 @@ const EditorHookUtilTestComponent = ({
     number,
     ...props
 }) => {
-    const rootSelector = selectors => (
-        selectors.selectRoot()
-    );
-    const collected = useCollector({
-        selector: rootSelector
-    });
     const editor = useEditor({
         id: id,
     });
-    const handleAppend = () => {
-        const node = branch(
-            item({
-                type: 'Any',
-                props: {'data-testid': 'appended'},
-            })
-        );
-        editor.triggerCreate({
-            node: node,
-        });
-    }
-    const handleMoveToRoot = () => {
-        const targetId = collected.node.id;
-        editor.triggerMove({
-            targetId: targetId,
-        });
-    }
-    const handleSendFront = () => {
-        editor.triggerShift({
-            absolute: 0,
-        });
-    }
-    const handleDelete = () => {
-        editor.triggerDelete();
-    }
-    const handleReset = () => {
-        editor.triggerRewrite({
-            props: {text: 'Reset'}
-        });
-        editor.triggerListIndexAdd({
-            name: 'reseted'
-        });
-    }
-    const handleFix = () => {
-        editor.triggerMetaUpdate({
-            meta: {fixed: true},
-        })
-    }
-    const handleOutline = event => {
-        event.stopPropagation();
-        editor.triggerIndexToggle({
-            name: 'outlined'
-        })
-    }
-    const handlePanelRemove = event => {
-        event.stopPropagation();
-        editor.triggerIndexRemove({
-            name: 'panel'
-        });
-    }
-    const handleSelect = () => {
-        editor.triggerListIndexToggle({
-            name: 'selected'
-        });
-    }
-    const handleRollback = () => {
-        editor.triggerListIndexRemove({
-            name: 'reseted'
-        });
-    }
     const handleNumber = event => {
         const parser = Number.parseFloat;
         editor.handleUpdate(event, parser);
@@ -134,7 +68,6 @@ const EditorHookUtilTestComponent = ({
     return <div>
         <div 
             onClick = {editor.handlePanel}
-            onDoubleClick = {handleSelect}
             {...props}
         />
         <label htmlFor = 'text'>Text</label>
@@ -153,33 +86,6 @@ const EditorHookUtilTestComponent = ({
             value = {number}
             onChange = {handleNumber}
         />
-        <button onClick = {handleAppend}>
-            Append Child
-        </button>
-        <button onClick = {handleMoveToRoot}>
-            Move to Root
-        </button>
-        <button onClick = {handleSendFront}>
-            Send to Front
-        </button>
-        <button onClick = {handleDelete}>
-            Delete
-        </button>
-        <button onClick = {handleReset}>
-            Reset
-        </button>
-        <button onClick = {handleRollback}>
-            Rollback
-        </button>
-        <button onClick = {handleFix}>
-            Fix
-        </button>
-        <button onClick = {handlePanelRemove}>
-            Remove panel
-        </button>
-        <button onClick = {handleOutline}>
-            Outline
-        </button>
     </div>
 }
 
@@ -429,149 +335,150 @@ describe('useEditor', () => {
             )
         );
 
-        const view = {
-            Any: ViewTestComponent,
-            Editor: EditorHookUtilTestComponent
-        };
+        const wrapper = ({children, onTree}) => (
+            <Builder initialTree = {initialTree}>
+                <TreeTestComponent onTree = {onTree} />
+                {children}
+            </Builder>
+        );
 
         test('should trigger create to append child node', () => {
             const onTree = jest.fn();
-            render(<Builder initialTree = {initialTree}>
-                <Workspace view = {view} />
-                <TreeTestComponent onTree = {onTree} />
-            </Builder>);      
+            const initialProps = {onTree: onTree};
+            const hook = renderHook(() => useEditor({
+                id: id_3
+            }), {wrapper: wrapper, initialProps: initialProps});  
+            const editor = hook.result.current;   
             const getTree = () => onTree.mock.calls[onTree.mock.calls.length - 1][0]
-            const button = screen.getByRole('button', {name: /append/i});
-            fireEvent.click(button);
+            const id_append = itemid();
+            const root = item({__id__: id_append, type: 'Any'});
+            const node = branch(root);
+            act(() => editor.triggerCreate({node: node}));
             expect(getTree().byIds[id_3].childIds.length).toBe(2);
-            expect(screen.getByTestId(/appended/i)).toBeInTheDocument();
+            expect(getTree().byIds[id_append]).toBeDefined();
         });
 
         test('should trigger move for node in tree', () => {
             const onTree = jest.fn();
-            render(<Builder initialTree = {initialTree}>
-                <Workspace view = {view} />
-                <TreeTestComponent onTree = {onTree} />
-            </Builder>);      
+            const initialProps = {onTree: onTree};
+            const hook = renderHook(() => useEditor({
+                id: id_3
+            }), {wrapper: wrapper, initialProps: initialProps});
+            const editor = hook.result.current;        
             const getTree = () => onTree.mock.calls[onTree.mock.calls.length - 1][0]
-            const button = screen.getByRole('button', {name: /move to root/i});
-            fireEvent.click(button);
+            act(() => editor.triggerMove({targetId: id_1}));
             expect(getTree().byIds[id_3].parentId).toBe(id_1)
             expect(getTree().byIds[id_1].childIds).toContain(id_3);
         });
 
         test('should trigger shift for node in tree', () => {
             const onTree = jest.fn();
-            render(<Builder initialTree = {initialTree}>
-                <Workspace view = {view} />
-                <TreeTestComponent onTree = {onTree} />
-            </Builder>);      
+            const initialProps = {onTree: onTree};
+            const hook = renderHook(() => useEditor({
+                id: id_3
+            }), {wrapper: wrapper, initialProps: initialProps});
+            const editor = hook.result.current;     
             const getTree = () => onTree.mock.calls[onTree.mock.calls.length - 1][0]
-            const button = screen.getByRole('button', {name: /send to front/i});
-            expect(getTree().byIds[id_1].childIds[0]).toBe(id_2);
-            // Should shift after button click
-            fireEvent.click(button);
+            act(() => editor.triggerShift({absolute: 0}));
             expect(getTree().byIds[id_1].childIds[0]).toBe(id_3);
             expect(getTree().byIds[id_1].childIds[1]).toBe(id_2);
         });
 
         test('should trigger delete for node and all of its children', () => {
             const onTree = jest.fn();
-            render(<Builder initialTree = {initialTree}>
-                <Workspace view = {view} />
-                <TreeTestComponent onTree = {onTree} />
-            </Builder>);      
+            const initialProps = {onTree: onTree};
+            const hook = renderHook(() => useEditor({
+                id: id_3
+            }), {wrapper: wrapper, initialProps: initialProps});  
+            const editor = hook.result.current;      
             const getTree = () => onTree.mock.calls[onTree.mock.calls.length - 1][0]
-            const button = screen.getByRole('button', {name: /delete/i});
-            fireEvent.click(button);
+            act(() => editor.triggerDelete());
             // Both node and child should be 
-            // deleted from tree.
+            // deleted from tree
             expect(getTree().byIds[id_3]).toBeUndefined();
             expect(getTree().byIds[id_4]).toBeUndefined();
         });
 
         test('should trigger rewrite for node props', () => {
             const onTree = jest.fn();
-            render(<Builder initialTree = {initialTree}>
-                <Workspace view = {view} />
-                <TreeTestComponent onTree = {onTree} />
-            </Builder>);      
+            const initialProps = {onTree: onTree};
+            const hook = renderHook(() => useEditor({
+                id: id_3
+            }), {wrapper: wrapper, initialProps: initialProps});    
+            const editor = hook.result.current;    
             const getTree = () => onTree.mock.calls[onTree.mock.calls.length - 1][0]
-            const button = screen.getByRole('button', {name: /reset/i});
-            fireEvent.click(button);
+            act(() => editor.triggerRewrite({props: {text: 'Reset'}}));
             expect(getTree().byIds[id_3].props).toEqual({text: 'Reset'});
         });
 
         test('should trigger meta update for node', () => {
             const onTree = jest.fn();
-            render(<Builder initialTree = {initialTree}>
-                <Workspace view = {view} />
-                <TreeTestComponent onTree = {onTree} />
-            </Builder>);      
+            const initialProps = {onTree: onTree};
+            const hook = renderHook(() => useEditor({
+                id: id_3
+            }), {wrapper: wrapper, initialProps: initialProps});
+            const editor = hook.result.current;        
             const getTree = () => onTree.mock.calls[onTree.mock.calls.length - 1][0]
-            const button = screen.getByRole('button', {name: /fix/i});
-            fireEvent.click(button);
+            act(() => editor.triggerMetaUpdate({meta: {fixed: true}}));
             expect(getTree().meta[id_3]).toHaveProperty('fixed', true);
         });
 
         test('should trigger index add and remove for node', () => {
             const onTree = jest.fn();
-            render(<Builder initialTree = {initialTree}>
-                <Workspace view = {view} />
-                <TreeTestComponent onTree = {onTree} />
-            </Builder>);      
+            const initialProps = {onTree: onTree};
+            const hook = renderHook(() => useEditor({
+                id: id_3
+            }), {wrapper: wrapper, initialProps: initialProps});   
+            const editor = hook.result.current;     
             const getTree = () => onTree.mock.calls[onTree.mock.calls.length - 1][0]
-            const editor = screen.getByTestId('editor');
-            fireEvent.click(editor);
-            expect(getTree().index.panel).toBe(id_3)
-            const button = screen.getByRole('button', {name: /remove panel/i});
-            fireEvent.click(button);
+            act(() => editor.triggerIndexAdd({name: 'panel'}));
+            expect(getTree().index.panel).toBe(id_3);
+            act(() => editor.triggerIndexRemove({name: 'panel'}));
             expect(getTree().index.panel).toBeFalsy();
         });
 
         test('should trigger index toggle for node', () => {
             const onTree = jest.fn();
-            render(<Builder initialTree = {initialTree}>
-                <Workspace view = {view} />
-                <TreeTestComponent onTree = {onTree} />
-            </Builder>);      
+            const initialProps = {onTree: onTree};
+            const hook = renderHook(() => useEditor({
+                id: id_3
+            }), {wrapper: wrapper, initialProps: initialProps});
+            const editor = hook.result.current;        
             const getTree = () => onTree.mock.calls[onTree.mock.calls.length - 1][0]
-            const button = screen.getByRole('button', {name: /outline/i});
-            fireEvent.click(button);
+            act(() => editor.triggerIndexToggle({name: 'outlined'}));
             expect(getTree().index.outlined).toBe(id_3)
             // Click again to toggle
-            fireEvent.click(button);
+            act(() => editor.triggerIndexToggle({name: 'outlined'}));
             expect(getTree().index.outlined).not.toBe(id_3);
         });
 
         test('should trigger list index add and remove for node', () => {
             const onTree = jest.fn();
-            render(<Builder initialTree = {initialTree}>
-                <Workspace view = {view} />
-                <TreeTestComponent onTree = {onTree} />
-            </Builder>);      
+            const initialProps = {onTree: onTree};
+            const hook = renderHook(() => useEditor({
+                id: id_3
+            }), {wrapper: wrapper, initialProps: initialProps});
+            const editor = hook.result.current;        
             const getTree = () => onTree.mock.calls[onTree.mock.calls.length - 1][0]
-            const button_reset = screen.getByRole('button', {name: /reset/i});
-            fireEvent.click(button_reset);
+            act(() => editor.triggerListIndexAdd({name: 'reseted'}));
             expect(getTree().index_list.reseted).toContain(id_3)
             // Click again to toggle
-            const button_rollback = screen.getByRole('button', {name: /rollback/i});
-            fireEvent.click(button_rollback);
+            act(() => editor.triggerListIndexRemove({name: 'reseted'}));
             expect(getTree().index_list.reseted).not.toContain(id_3);
         });
 
         test('should trigger list index add and remove for node', () => {
             const onTree = jest.fn();
-            render(<Builder initialTree = {initialTree}>
-                <Workspace view = {view} />
-                <TreeTestComponent onTree = {onTree} />
-            </Builder>);      
+            const initialProps = {onTree: onTree};
+            const hook = renderHook(() => useEditor({
+                id: id_3
+            }), {wrapper: wrapper, initialProps: initialProps});  
+            const editor = hook.result.current;      
             const getTree = () => onTree.mock.calls[onTree.mock.calls.length - 1][0]
-            const editor = screen.getByTestId('editor');
-            fireEvent.doubleClick(editor);
+            act(() => editor.triggerListIndexToggle({name: 'selected'}));
             expect(getTree().index_list.selected).toContain(id_3)
             // Click again to toggle
-            fireEvent.doubleClick(editor);
+            act(() => editor.triggerListIndexToggle({name: 'selected'}));
             expect(getTree().index_list.selected).not.toContain(id_3);
         });
 
