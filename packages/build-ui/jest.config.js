@@ -4,4 +4,9 @@ module.exports = {
     transform: {
         '^.+\\.js$': 'babel-jest',
     },
+    coveragePathIgnorePatterns: [
+        'node_modules',
+        'test-components',
+        'test-utils'
+    ],
 }
