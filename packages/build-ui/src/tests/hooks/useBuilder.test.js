@@ -204,43 +204,48 @@ describe('useBuilder', () => {
 
     });
 
-    test('should provide json function to return current tree', () => {
-        const onTree = jest.fn();
-        render(<Builder initialTree = {initialTree}>
-            <Workspace view = {view} />
-            <BuilderHookTestComponent onTree = {onTree} />
-        </Builder>);      
-        const getTree = () => onTree.mock.calls[onTree.mock.calls.length - 1][0]
-        expect(getTree()).toEqual(plainBranch(initialTree));
-    });
+    describe('utility functions and types', () => {
 
-    test('should provide loadTree to set current tree', () => {
         const onHistory = jest.fn();
-        render(<Builder initialTree = {initialTree}>
-            <Workspace view = {view} />
-            <BuilderHookTestComponent onHistory = {onHistory} />
-        </Builder>);      
         const getHistory = () => onHistory.mock.calls[onHistory.mock.calls.length - 1][0]
         const getTree = () => getHistory().present;
-        expect(getTree().byIds[id_1]).toBeTruthy();
-        expect(screen.getByDisplayValue('Hello')).toBeInTheDocument();
-        const load = screen.getByRole('button', {name: /load/i});
-        fireEvent.click(load);
-        expect(getTree().byIds[id_1]).toBeFalsy();
-        expect(screen.getByDisplayValue('Replace')).toBeInTheDocument();
-    });
 
-    test('should provide loadTree to restart history', () => {
-        const onHistory = jest.fn();
-        render(<Builder initialTree = {initialTree}>
-            <Workspace view = {view} />
-            <BuilderHookTestComponent onHistory = {onHistory} />
-        </Builder>);      
-        const getHistory = () => onHistory.mock.calls[onHistory.mock.calls.length - 1][0]
-        const load = screen.getByRole('button', {name: /load/i});
-        fireEvent.click(load);
-        expect(getHistory().version).toBe(0);
-        expect(getHistory().timeline.length).toBe(0);
+        afterEach(() => {
+            onHistory.mockReset();
+        });
+
+        test('should provide json function to return current tree', () => {
+            render(<Builder initialTree = {initialTree}>
+                <Workspace view = {view} />
+                <BuilderHookTestComponent onHistory = {onHistory} />
+            </Builder>);      
+            expect(getTree()).toEqual(plainBranch(initialTree));
+        });
+    
+        test('should provide loadTree to set current tree', () => {
+            render(<Builder initialTree = {initialTree}>
+                <Workspace view = {view} />
+                <BuilderHookTestComponent onHistory = {onHistory} />
+            </Builder>);      
+            expect(getTree().byIds[id_1]).toBeTruthy();
+            expect(screen.getByDisplayValue('Hello')).toBeInTheDocument();
+            const load = screen.getByRole('button', {name: /load/i});
+            fireEvent.click(load);
+            expect(getTree().byIds[id_1]).toBeFalsy();
+            expect(screen.getByDisplayValue('Replace')).toBeInTheDocument();
+        });
+    
+        test('should provide loadTree to restart history', () => {
+            render(<Builder initialTree = {initialTree}>
+                <Workspace view = {view} />
+                <BuilderHookTestComponent onHistory = {onHistory} />
+            </Builder>);      
+            const load = screen.getByRole('button', {name: /load/i});
+            fireEvent.click(load);
+            expect(getHistory().version).toBe(0);
+            expect(getHistory().timeline.length).toBe(0);
+        });
+
     });
 
 });

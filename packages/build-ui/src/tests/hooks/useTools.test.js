@@ -89,14 +89,19 @@ describe('useTools', () => {
             Any: ViewTestComponent,
         };
 
+        const onTree = jest.fn();
+        const getTree = () => onTree.mock.calls[onTree.mock.calls.length - 1][0]
+
+        afterEach(() => {
+            onTree.mockReset();
+        });
+
         test('should provide dragStart and dragEnd support for typical DnD', () => {
-            const onTree = jest.fn();
             render(<Builder initialTree = {initialTree}>
                 <Workspace view = {view} />
                 <ToolsHookTestComponent />
                 <TreeTestComponent onTree = {onTree} />
             </Builder>);      
-            const getTree = () => onTree.mock.calls[onTree.mock.calls.length - 1][0]
             const tools = screen.getByText(/accept/i);
             const drop = screen.getByTestId('drop_1');
             fireEvent.dragStart(tools);
@@ -107,13 +112,11 @@ describe('useTools', () => {
         });
 
         test('should be able to create with tool and cancel on drop', () => {
-            const onTree = jest.fn();
             render(<Builder initialTree = {initialTree}>
                 <Workspace view = {view} />
                 <ToolsHookTestComponent />
                 <TreeTestComponent onTree = {onTree} />
             </Builder>);      
-            const getTree = () => onTree.mock.calls[onTree.mock.calls.length - 1][0]
             const tools = screen.getByText(/reject/i);
             const drop = screen.getByTestId('drop_1');
             fireEvent.dragStart(tools);
