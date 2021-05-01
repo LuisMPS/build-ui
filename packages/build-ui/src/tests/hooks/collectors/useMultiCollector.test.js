@@ -101,6 +101,29 @@ describe('useMulticollector', () => {
             expect(collected.nodes).toHaveProperty(id_1);
             expect(collected.nodes).toHaveProperty(id_3);
         });
+        
+        test('should collect empty object with unexistent index list selector', () => {
+            const selector = selectors => (
+                selectors.selectMultipleByIndex('fake')
+            );
+            const hook = renderHook(() => useMultiCollector({
+                selector: selector
+            }), {wrapper: wrapper});
+            const collected = hook.result.current;
+            expect(collected.nodes).toEqual({})
+        });
+
+        test('should collect correctly with filter selector', () => {
+            const filter = node => node.props.number > 2;
+            const selector = selectors => (
+                selectors.selectMultipleByFilter(filter)
+            );
+            const hook = renderHook(() => useMultiCollector({
+                selector: selector
+            }), {wrapper: wrapper});
+            const collected = hook.result.current;
+            expect(collected.nodes).toHaveProperty(id_3);
+        });
 
         test('should collect correctly with children', () => {
             const selector = selectors => (
