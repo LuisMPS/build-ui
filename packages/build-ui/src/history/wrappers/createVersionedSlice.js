@@ -3,12 +3,11 @@ import batched from "../enhancers/batched";
 import unbatched from "../enhancers/unbatched";
 import signer from "../enhancers/signer";
 import proxy from "../enhancers/proxy";
-import {commitHistory, precommitHistory, redoHistory, undoHistory, restartHistory, configureBatchHistory, configureHistory} from "../reducers";
+import {commitHistory, redoHistory, undoHistory, restartHistory, configureBatchHistory, configureHistory} from "../reducers";
 import {isFunction} from "../utils/function";
 
 const commitReducers = {
     commitHistory: commitHistory,
-    precommitHistory: precommitHistory,
 }
 
 const historyReducers = {

@@ -93,7 +93,6 @@ const {
     redoHistory,
     restartHistory,
     commitHistory,
-    precommitHistory,
     configureHistory,
     configureBatchHistory,
 } = actions;
@@ -125,7 +124,6 @@ export {
     redoHistory,
     restartHistory,
     commitHistory,
-    precommitHistory,
     configureHistory,
     configureBatchHistory,
 };
