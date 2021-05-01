@@ -1,6 +1,6 @@
-import useActions from "./useActions";
 import useNodeDnD from "./dnd/useNodeDnD";
 import useCollector from "./collectors/useCollector";
+import useActions from "./useActions";
 import {setIn} from "../utils/object";
 
 const useEditor = ({
@@ -25,97 +25,22 @@ const useEditor = ({
         id: id,
     });
     const actions = useActions();
-    function triggerCreate(create) {
-        actions.triggerCreate({
-            ...create,
-            targetId: id,
-        });
-    }
-    function triggerDelete() {
-        actions.triggerDelete({
-            id: id
-        });
-    }
-    function triggerMove(move) {
-        actions.triggerMove({
-            ...move,
-            id: id,
-        });
-    }
-    function triggerShift(shift) {
-        actions.triggerShift({
-            ...shift,
-            id: id,
-        });
-    }
-    function triggerUpdate(update) {
-        actions.triggerUpdate({
-            ...update,
-            id: id,
-        });
-    }
-    function triggerRewrite(rewrite) {
-        actions.triggerRewrite({
-            ...rewrite,
-            id: id,
-        });
-    }
-    function triggerMetaUpdate(update) {
-        actions.triggerMetaUpdate({
-            ...update,
-            id: id,
-        });
-    }
-    function triggerIndexAdd(add) {
-        actions.triggerIndexAdd({
-            ...add,
-            id: id,
-        });
-    }
-    function triggerIndexRemove(remove) {
-        actions.triggerIndexRemove({
-            ...remove,
-            id: id,
-        });
-    }
-    function triggerIndexToggle(toggle) {
-        actions.triggerIndexToggle({
-            ...toggle,
-            id: id,
-        });
-    }
-    function triggerListIndexAdd(add) {
-        actions.triggerListIndexAdd({
-            ...add,
-            id: id,
-        });
-    }
-    function triggerListIndexRemove(remove) {
-        actions.triggerListIndexRemove({
-            ...remove,
-            id: id,
-        });
-    }
-    function triggerListIndexToggle(toggle) {
-        actions.triggerListIndexToggle({
-            ...toggle,
-            id: id,
-        });
-    }
     function handleUpdate(event, parser) {
         const name = event.target.name;
         const value = parser 
         ? parser(event.target.value)
         : event.target.value;
         const props = setIn({}, name, value);
-        triggerUpdate({
+        actions.timeBatched.triggerUpdate({
+            id: id,
             props: props,
         });
     }
     function handlePanel(event) {
         event.stopPropagation();
         // Trigger index change
-        triggerIndexAdd({
+        actions.timeBatched.triggerIndexAdd({
+            id: id,
             name: 'panel',
         });
     }
@@ -123,6 +48,8 @@ const useEditor = ({
         props: props,
     }
     const {
+        isTransfering,
+        isTransferingType,
         transferType,
         setTransferType,
         ...dndBag
@@ -131,26 +58,14 @@ const useEditor = ({
         handleUpdate,
         handlePanel,
     }
-    const triggers = {
-        triggerCreate,
-        triggerDelete,
-        triggerMove,
-        triggerShift,
-        triggerUpdate,
-        triggerRewrite,
-        triggerMetaUpdate,
-        triggerIndexAdd,
-        triggerIndexRemove,
-        triggerIndexToggle,
-        triggerListIndexAdd,
-        triggerListIndexRemove,
-        triggerListIndexToggle,
+    const flags = {
+        isTransfering: isTransferingType
     }
     const bag = {
         ...editorBag,
         ...dndBag,
         ...handlers,
-        ...triggers,
+        ...flags,
     }
     return bag;
 }
