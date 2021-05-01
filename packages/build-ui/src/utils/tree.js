@@ -164,7 +164,7 @@ export function normalizeItem(item) {
     const node = {
         id: id,
         type: item.detail.type || null,
-        props: item.detail.props || null,
+        props: item.detail.props || {},
         childIds: item.detail.childIds || [],
         parentId: item.detail.parentId || null,
     };
