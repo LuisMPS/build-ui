@@ -1,5 +1,5 @@
 import {useDispatch} from "react-redux";
-import {moveNode, intershiftNode, updateNode, rewriteNode, updateMeta, removeIndex, removeListIndex, addIndex, addListIndex, toggleIndex, toggleListIndex, clearIndex, clearListIndex} from "../slices/tree";
+import {addIndexBatched, addIndexUnbatched, addIndexUnrecorded, addListIndexBatched, addListIndexUnbatched, addListIndexUnrecorded, clearIndexBatched, clearIndexUnbatched, clearIndexUnrecorded, clearListIndexBatched, clearListIndexUnbatched, clearListIndexUnrecorded, commitHistory, intershiftNodeBatched, intershiftNodeUnbatched, intershiftNodeUnrecorded, moveNodeBatched, moveNodeUnbatched, moveNodeUnrecorded, removeIndexBatched, removeIndexUnbatched, removeIndexUnrecorded, removeListIndexBatched, removeListIndexUnbatched, removeListIndexUnrecorded, rewriteNodeBatched, rewriteNodeUnbatched, rewriteNodeUnrecorded, toggleIndexBatched, toggleIndexUnbatched, toggleIndexUnrecorded, toggleListIndexBatched, toggleListIndexUnbatched, toggleListIndexUnrecorded, updateMetaBatched, updateMetaUnbatched, updateMetaUnrecorded, updateNodeBatched, updateNodeUnbatched, updateNodeUnrecorded} from "../slices/tree";
 import {useCreator, useDeleter} from "./useComposed";
 import {setIn} from "../utils/object";
 import useSketchContext from "./useSketchContext";
@@ -10,37 +10,18 @@ const useActions = () => {
     const batcher = context.batcher;
     const creator = useCreator();
     const deleter = useDeleter();
-    function triggerCreate(create) {
-        creator.handleCreate({
-            targetId: create.targetId,
-            node: create.node,
-            position: create.position,
-        });
-        batcher.refresh();
-    }
-    function triggerDelete(deleted) {
-        deleter.handleDelete({
-            id: deleted.id,
-        });
-        batcher.refresh();
-    }
-    function triggerMove(move) {
-        dispatch(moveNode({
-            targetId: move.targetId,
-            id: move.id,
-            position: move.position,
-        }));
-        batcher.refresh();
-    }
-    function triggerShift(shift) {
-        dispatch(intershiftNode({
-            id: shift.id,
-            absolute: shift.absolute,
-            relative: shift.relative,
-        }));
-        batcher.refresh();
-    }
-    function triggerUpdate(update) {
+    // Payload extractors
+    const movePayload = move => ({
+        targetId: move.targetId,
+        id: move.id,
+        position: move.position,
+    });
+    const shiftPayload = shift => ({
+        id: shift.id,
+        absolute: shift.absolute,
+        relative: shift.relative,
+    });
+    const updatePayload = update => {
         const props = update.props;
         const _props = Object.keys(props)
         .reduce((update, prop) => setIn(
@@ -48,13 +29,12 @@ const useActions = () => {
             prop, 
             props[prop]
         ), {});
-        dispatch(updateNode({
+        return ({
             id: update.id,
             props: _props,
-        }));
-        batcher.refresh();
+        });
     }
-    function triggerRewrite(rewrite) {
+    const rewritePayload = rewrite => {
         const props = rewrite.props;
         const _props = Object.keys(props)
         .reduce((update, prop) => setIn(
@@ -62,13 +42,12 @@ const useActions = () => {
             prop, 
             props[prop]
         ), {});
-        dispatch(rewriteNode({
+        return ({
             id: rewrite.id,
             props: _props,
-        }));
-        batcher.refresh();
+        });
     }
-    function triggerMetaUpdate(update) {
+    const metaUpdatePayload = update => {
         const meta = update.meta;
         const _meta = Object.keys(meta)
         .reduce((update, prop) => setIn(
@@ -76,82 +55,427 @@ const useActions = () => {
             prop, 
             meta[prop]
         ), {});
-        dispatch(updateMeta({
+        return ({
             id: update.id,
             meta: _meta,
-        }));
+        });
+    };
+    const indexAddPayload = add => ({
+        id: add.id,
+        name: add.name,
+    });
+    const listIndexAddPayload = add => ({
+        id: add.id,
+        name: add.name,
+    });
+    const indexRemovePayload = remove => ({
+        id: remove.id,
+        name: remove.name
+    });
+    const listIndexRemovePayload = remove => ({
+        id: remove.id,
+        name: remove.name
+    });
+    const indexTogglePayload = toggle => ({
+        id: toggle.id,
+        name: toggle.name
+    });
+    const listIndexTogglePayload = toggle => ({
+        id: toggle.id,
+        name: toggle.name
+    });
+    const indexClearPayload = clear => ({
+        name: clear.name
+    });
+    const listIndexClearPayload = clear => ({
+        name: clear.name
+    });
+    // Time batched actions
+    function triggerCreateTimeBatched(create) {
+        creator.handleCreateBatched(create);
         batcher.refresh();
     }
-    function triggerIndexAdd(add) {
-        dispatch(addIndex({
-            id: add.id,
-            name: add.name,
-        }));
+    function triggerDeleteTimeBatched(deleted) {
+        deleter.handleDeleteBatched(deleted);
         batcher.refresh();
     }
-    function triggerListIndexAdd(add) {
-        dispatch(addListIndex({
-            id: add.id,
-            name: add.name,
-        }));
+    function triggerMoveTimeBatched(move) {
+        dispatch(moveNodeBatched(
+            movePayload(move)
+        ));
         batcher.refresh();
     }
-    function triggerIndexRemove(remove) {
-        dispatch(removeIndex({
-            id: remove.id,
-            name: remove.name
-        }));
+    function triggerShiftTimeBatched(shift) {
+        dispatch(intershiftNodeBatched(
+            shiftPayload(shift)
+        ));
         batcher.refresh();
     }
-    function triggerListIndexRemove(remove) {
-        dispatch(removeListIndex({
-            id: remove.id,
-            name: remove.name
-        }));
+    function triggerUpdateTimeBatched(update) {
+        dispatch(updateNodeBatched(
+            updatePayload(update)
+        ));
         batcher.refresh();
     }
-    function triggerIndexToggle(toggle) {
-        dispatch(toggleIndex({
-            id: toggle.id,
-            name: toggle.name
-        }));
+    function triggerRewriteTimeBatched(rewrite) {
+        dispatch(rewriteNodeBatched(
+            rewritePayload(rewrite)
+        ));
         batcher.refresh();
     }
-    function triggerListIndexToggle(toggle) {
-        dispatch(toggleListIndex({
-            id: toggle.id,
-            name: toggle.name
-        }));
+    function triggerMetaUpdateTimeBatched(update) {
+        dispatch(updateMetaBatched(
+            metaUpdatePayload(update)
+        ));
         batcher.refresh();
     }
-    function triggerIndexClear(clear) {
-        dispatch(clearIndex({
-            name: clear.name
-        }));
+    function triggerIndexAddTimeBatched(add) {
+        dispatch(addIndexBatched(
+            indexAddPayload(add)
+        ));
         batcher.refresh();
     }
-    function triggerListIndexClear(clear) {
-        dispatch(clearListIndex({
-            name: clear.name
-        }));
+    function triggerListIndexAddTimeBatched(add) {
+        dispatch(addListIndexBatched(
+            listIndexAddPayload(add)
+        ));
         batcher.refresh();
+    }
+    function triggerIndexRemoveTimeBatched(remove) {
+        dispatch(removeIndexBatched(
+            indexRemovePayload(remove)
+        ));
+        batcher.refresh();
+    }
+    function triggerListIndexRemoveTimeBatched(remove) {
+        dispatch(removeListIndexBatched(
+            listIndexRemovePayload(remove)
+        ));
+        batcher.refresh();
+    }
+    function triggerIndexToggleTimeBatched(toggle) {
+        dispatch(toggleIndexBatched(
+            indexTogglePayload(toggle)
+        ));
+        batcher.refresh();
+    }
+    function triggerListIndexToggleTimeBatched(toggle) {
+        dispatch(toggleListIndexBatched(
+            listIndexTogglePayload(toggle)
+        ));
+        batcher.refresh();
+    }
+    function triggerIndexClearTimeBatched(clear) {
+        dispatch(clearIndexBatched(
+            indexClearPayload(clear)
+        ));
+        batcher.refresh();
+    }
+    function triggerListIndexClearTimeBatched(clear) {
+        dispatch(clearListIndexBatched(
+            listIndexClearPayload(clear)
+        ));
+        batcher.refresh();
+    }
+    // Batched actions
+    function triggerCreateBatched(create) {
+        creator.handleCreateBatched(create);
+    }
+    function triggerDeleteBatched(deleted) {
+        deleter.handleDeleteBatched(deleted);
+    }
+    function triggerMoveBatched(move) {
+        dispatch(moveNodeBatched(
+            movePayload(move)
+        ));
+    }
+    function triggerShiftBatched(shift) {
+        dispatch(intershiftNodeBatched(
+            shiftPayload(shift)
+        ));
+    }
+    function triggerUpdateBatched(update) {
+        dispatch(updateNodeBatched(
+            updatePayload(update)
+        ));
+    }
+    function triggerRewriteBatched(rewrite) {
+        dispatch(rewriteNodeBatched(
+            rewritePayload(rewrite)
+        ));
+    }
+    function triggerMetaUpdateBatched(update) {
+        dispatch(updateMetaBatched(
+            metaUpdatePayload(update)
+        ));
+    }
+    function triggerIndexAddBatched(add) {
+        dispatch(addIndexBatched(
+            indexAddPayload(add)
+        ));
+    }
+    function triggerListIndexAddBatched(add) {
+        dispatch(addListIndexBatched(
+            listIndexAddPayload(add)
+        ));
+    }
+    function triggerIndexRemoveBatched(remove) {
+        dispatch(removeIndexBatched(
+            indexRemovePayload(remove)
+        ));
+    }
+    function triggerListIndexRemoveBatched(remove) {
+        dispatch(removeListIndexBatched(
+            listIndexRemovePayload(remove)
+        ));
+    }
+    function triggerIndexToggleBatched(toggle) {
+        dispatch(toggleIndexBatched(
+            indexTogglePayload(toggle)
+        ));
+    }
+    function triggerListIndexToggleBatched(toggle) {
+        dispatch(toggleListIndexBatched(
+            listIndexTogglePayload(toggle)
+        ));
+    }
+    function triggerIndexClearBatched(clear) {
+        dispatch(clearIndexBatched(
+            indexClearPayload(clear)
+        ));
+    }
+    function triggerListIndexClearBatched(clear) {
+        dispatch(clearListIndexBatched(
+            listIndexClearPayload(clear)
+        ));
+    }
+    // Unbatched actions
+    function triggerCreateUnbatched(create) {
+        creator.handleCreateBatched(create);
+        // Dispatch commit history
+        // directly after batching
+        // create actions to simulate
+        // unbatched action.
+        dispatch(commitHistory({}))
+    }
+    function triggerDeleteUnbatched(deleted) {
+        deleter.handleDeleteBatched(deleted)
+         // Dispatch commit history
+        // directly after batching
+        // delete actions to simulate
+        // unbatched action.
+        dispatch(commitHistory({}))
+    }
+    function triggerMoveUnbatched(move) {
+        dispatch(moveNodeUnbatched(
+            movePayload(move)
+        ));
+    }
+    function triggerShiftUnbatched(shift) {
+        dispatch(intershiftNodeUnbatched(
+            shiftPayload(shift)
+        ));
+    }
+    function triggerUpdateUnbatched(update) {
+        dispatch(updateNodeUnbatched(
+            updatePayload(update)
+        ));
+    }
+    function triggerRewriteUnbatched(rewrite) {
+        dispatch(rewriteNodeUnbatched(
+            rewritePayload(rewrite)
+        ));
+    }
+    function triggerMetaUpdateUnbatched(update) {
+        dispatch(updateMetaUnbatched(
+            metaUpdatePayload(update)
+        ));
+    }
+    function triggerIndexAddUnbatched(add) {
+        dispatch(addIndexUnbatched(
+            indexAddPayload(add)
+        ));
+    }
+    function triggerListIndexAddUnbatched(add) {
+        dispatch(addListIndexUnbatched(
+            listIndexAddPayload(add)
+        ));
+    }
+    function triggerIndexRemoveUnbatched(remove) {
+        dispatch(removeIndexUnbatched(
+            indexRemovePayload(remove)
+        ));
+    }
+    function triggerListIndexRemoveUnbatched(remove) {
+        dispatch(removeListIndexUnbatched(
+            listIndexRemovePayload(remove)
+        ));
+    }
+    function triggerIndexToggleUnbatched(toggle) {
+        dispatch(toggleIndexUnbatched(
+            indexTogglePayload(toggle)
+        ));
+    }
+    function triggerListIndexToggleUnbatched(toggle) {
+        dispatch(toggleListIndexUnbatched(
+            listIndexTogglePayload(toggle)
+        ));
+    }
+    function triggerIndexClearUnbatched(clear) {
+        dispatch(clearIndexUnbatched(
+            indexClearPayload(clear)
+        ));
+    }
+    function triggerListIndexClearUnbatched(clear) {
+        dispatch(clearListIndexUnbatched(
+            listIndexClearPayload(clear)
+        ));
+    }
+    // Unrecorded actions
+    function triggerCreateUnrecorded(create) {
+        creator.handleCreateUnrecorded(create)
+    }
+    function triggerDeleteUnrecorded(deleted) {
+        deleter.handleDeleteUnrecorded(deleted)
+    }
+    function triggerMoveUnrecorded(move) {
+        dispatch(moveNodeUnrecorded(
+            movePayload(move)
+        ));
+    }
+    function triggerShiftUnrecorded(shift) {
+        dispatch(intershiftNodeUnrecorded(
+            shiftPayload(shift)
+        ));
+    }
+    function triggerUpdateUnrecorded(update) {
+        dispatch(updateNodeUnrecorded(
+            updatePayload(update)
+        ));
+    }
+    function triggerRewriteUnrecorded(rewrite) {
+        dispatch(rewriteNodeUnrecorded(
+            rewritePayload(rewrite)
+        ));
+    }
+    function triggerMetaUpdateUnrecorded(update) {
+        dispatch(updateMetaUnrecorded(
+            metaUpdatePayload(update)
+        ));
+    }
+    function triggerIndexAddUnrecorded(add) {
+        dispatch(addIndexUnrecorded(
+            indexAddPayload(add)
+        ));
+    }
+    function triggerListIndexAddUnrecorded(add) {
+        dispatch(addListIndexUnrecorded(
+            listIndexAddPayload(add)
+        ));
+    }
+    function triggerIndexRemoveUnrecorded(remove) {
+        dispatch(removeIndexUnrecorded(
+            indexRemovePayload(remove)
+        ));
+    }
+    function triggerListIndexRemoveUnrecorded(remove) {
+        dispatch(removeListIndexUnrecorded(
+            listIndexRemovePayload(remove)
+        ));
+    }
+    function triggerIndexToggleUnrecorded(toggle) {
+        dispatch(toggleIndexUnrecorded(
+            indexTogglePayload(toggle)
+        ));
+    }
+    function triggerListIndexToggleUnrecorded(toggle) {
+        dispatch(toggleListIndexUnrecorded(
+            listIndexTogglePayload(toggle)
+        ));
+    }
+    function triggerIndexClearUnrecorded(clear) {
+        dispatch(clearIndexUnrecorded(
+            indexClearPayload(clear)
+        ));
+    }
+    function triggerListIndexClearUnrecorded(clear) {
+        dispatch(clearListIndexUnrecorded(
+            listIndexClearPayload(clear)
+        ));
+    }
+    const timeBatched = {
+        triggerCreate: triggerCreateTimeBatched,
+        triggerDelete: triggerDeleteTimeBatched,
+        triggerMove: triggerMoveTimeBatched,
+        triggerShift: triggerShiftTimeBatched,
+        triggerUpdate: triggerUpdateTimeBatched,
+        triggerRewrite: triggerRewriteTimeBatched,
+        triggerMetaUpdate: triggerMetaUpdateTimeBatched,
+        triggerIndexAdd: triggerIndexAddTimeBatched,
+        triggerIndexRemove: triggerIndexRemoveTimeBatched,
+        triggerIndexToggle: triggerIndexToggleTimeBatched,
+        triggerIndexClear: triggerIndexClearTimeBatched,
+        triggerListIndexAdd: triggerListIndexAddTimeBatched,
+        triggerListIndexRemove: triggerListIndexRemoveTimeBatched,
+        triggerListIndexToggle: triggerListIndexToggleTimeBatched,
+        triggerListIndexClear: triggerListIndexClearTimeBatched,
+    }
+    const batched = {
+        triggerCreate: triggerCreateBatched,
+        triggerDelete: triggerDeleteBatched,
+        triggerMove: triggerMoveBatched,
+        triggerShift: triggerShiftBatched,
+        triggerUpdate: triggerUpdateBatched,
+        triggerRewrite: triggerRewriteBatched,
+        triggerMetaUpdate: triggerMetaUpdateBatched,
+        triggerIndexAdd: triggerIndexAddBatched,
+        triggerIndexRemove: triggerIndexRemoveBatched,
+        triggerIndexToggle: triggerIndexToggleBatched,
+        triggerIndexClear: triggerIndexClearBatched,
+        triggerListIndexAdd: triggerListIndexAddBatched,
+        triggerListIndexRemove: triggerListIndexRemoveBatched,
+        triggerListIndexToggle: triggerListIndexToggleBatched,
+        triggerListIndexClear: triggerListIndexClearBatched,
+    }
+    const unbatched = {
+        triggerCreate: triggerCreateUnbatched,
+        triggerDelete: triggerDeleteUnbatched,
+        triggerMove: triggerMoveUnbatched,
+        triggerShift: triggerShiftUnbatched,
+        triggerUpdate: triggerUpdateUnbatched,
+        triggerRewrite: triggerRewriteUnbatched,
+        triggerMetaUpdate: triggerMetaUpdateUnbatched,
+        triggerIndexAdd: triggerIndexAddUnbatched,
+        triggerIndexRemove: triggerIndexRemoveUnbatched,
+        triggerIndexToggle: triggerIndexToggleUnbatched,
+        triggerIndexClear: triggerIndexClearUnbatched,
+        triggerListIndexAdd: triggerListIndexAddUnbatched,
+        triggerListIndexRemove: triggerListIndexRemoveUnbatched,
+        triggerListIndexToggle: triggerListIndexToggleUnbatched,
+        triggerListIndexClear: triggerListIndexClearUnbatched,
+    }
+    const unrecorded = {
+        triggerCreate: triggerCreateUnrecorded,
+        triggerDelete: triggerDeleteUnrecorded,
+        triggerMove: triggerMoveUnrecorded,
+        triggerShift: triggerShiftUnrecorded,
+        triggerUpdate: triggerUpdateUnrecorded,
+        triggerRewrite: triggerRewriteUnrecorded,
+        triggerMetaUpdate: triggerMetaUpdateUnrecorded,
+        triggerIndexAdd: triggerIndexAddUnrecorded,
+        triggerIndexRemove: triggerIndexRemoveUnrecorded,
+        triggerIndexToggle: triggerIndexToggleUnrecorded,
+        triggerIndexClear: triggerIndexClearUnrecorded,
+        triggerListIndexAdd: triggerListIndexAddUnrecorded,
+        triggerListIndexRemove: triggerListIndexRemoveUnrecorded,
+        triggerListIndexToggle: triggerListIndexToggleUnrecorded,
+        triggerListIndexClear: triggerListIndexClearUnrecorded,
     }
     const triggers = {
-        triggerCreate,
-        triggerDelete,
-        triggerMove,
-        triggerShift,
-        triggerUpdate,
-        triggerRewrite,
-        triggerMetaUpdate,
-        triggerIndexAdd,
-        triggerIndexRemove,
-        triggerIndexToggle,
-        triggerIndexClear,
-        triggerListIndexAdd,
-        triggerListIndexRemove,
-        triggerListIndexToggle,
-        triggerListIndexClear,
+        timeBatched: timeBatched,
+        batched: batched,
+        unbatched: unbatched,
+        unrecorded: unrecorded,
     }
     const bag = {
         ...triggers,

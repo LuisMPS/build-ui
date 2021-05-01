@@ -1,28 +1,49 @@
 import {useDispatch} from "react-redux";
-import {createNode, deleteNode,  replaceTree, createMeta, deleteMeta, createIndex, deleteIndex} from "../slices/tree";
+import {createNodeBatched, createIndexBatched, createMetaBatched, createNodeUnrecorded, createIndexUnrecorded, createMetaUnrecorded, deleteMetaUnrecorded, deleteMetaBatched, deleteIndexBatched, deleteNodeBatched, deleteIndexUnrecorded, deleteNodeUnrecorded, replaceTreeUnrecorded} from "../slices/tree";
 import {plainBranch} from "../utils/tree";
 
 const useCreator = () => {
     const dispatch = useDispatch();
-    const meta = useMeta();
-    function handleCreate(creation) {
+    // Not creating an unbatched 
+    // version for create since
+    // create actions must be 
+    // registered on a single history
+    // version.
+    function handleCreateBatched(creation) {
         const branch = creation.node;
         const node = plainBranch(branch);
-        dispatch(createNode({
+        dispatch(createNodeBatched({
             node: node,
             targetId: creation.targetId,
             position: creation.position,
         }));
-        dispatch(createIndex({
+        dispatch(createMetaBatched({
+            meta: node.meta,
+        }));
+        dispatch(createIndexBatched({
             index: node.index,
             index_list: node.index_list,
         }));
-        meta.handleMetaCreate({
+    }
+    function handleCreateUnrecorded(creation) {
+        const branch = creation.node;
+        const node = plainBranch(branch);
+        dispatch(createNodeUnrecorded({
+            node: node,
+            targetId: creation.targetId,
+            position: creation.position,
+        }));
+        dispatch(createMetaUnrecorded({
             meta: node.meta,
-        });
+        }));
+        dispatch(createIndexUnrecorded({
+            index: node.index,
+            index_list: node.index_list,
+        }));
     }
     const handlers = {
-        handleCreate: handleCreate,
+        handleCreateBatched,
+        handleCreateUnrecorded
     }
     const creatorBag = {
         
@@ -36,25 +57,43 @@ const useCreator = () => {
 
 const useDeleter = () => {
     const dispatch = useDispatch();
-    const meta = useMeta();
-    function handleDelete(deletion) {
+    // Not creating an unbatched 
+    // version for delete since
+    // delete actions must be 
+    // registered on a single history
+    // version.
+    function handleDeleteBatched(deletion) {
         const id = deletion.id;
-        dispatch(deleteIndex({
+        dispatch(deleteMetaBatched({
+            id: id,
+        }));
+        dispatch(deleteIndexBatched({
             id: id
         }));
-        meta.handleMetaDelete({
-            id: id,
-        });
         // Delete node dispatch should
         // ALWAYS be last to allow before
         // delete dispatches to access 
         // node children.
-        dispatch(deleteNode({
+        dispatch(deleteNodeBatched({
+            id: id
+        }));
+    }
+    function handleDeleteUnrecorded(deletion) {
+        const id = deletion.id;
+        dispatch(deleteMetaUnrecorded({
+            id: id,
+        }));
+        dispatch(deleteIndexUnrecorded({
+            id: id
+        }));
+        // Delete node is last.
+        dispatch(deleteNodeUnrecorded({
             id: id
         }));
     }
     const handlers = {
-        handleDelete: handleDelete,
+        handleDeleteBatched,
+        handleDeleteUnrecorded,
     }
     const deleterBag = {
         
@@ -71,7 +110,7 @@ const useReplacer = () => {
     function handleReplace(replace) {
         const branch = replace.tree;
         const tree = plainBranch(branch);
-        dispatch(replaceTree({
+        dispatch(replaceTreeUnrecorded({
             tree: tree,
         }));
     }
@@ -83,32 +122,6 @@ const useReplacer = () => {
     }
     const bag = {
         ...replacerBag,
-        ...handlers
-    }
-    return bag;
-}
-
-const useMeta = () => {
-    const dispatch = useDispatch();
-    function handleMetaCreate(creation) {
-        dispatch(createMeta({
-            meta: creation.meta,
-        }));
-    }
-    function handleMetaDelete(deletion) {
-        dispatch(deleteMeta({
-            id: deletion.id
-        }));
-    }
-    const handlers = {
-        handleMetaCreate,
-        handleMetaDelete,
-    }
-    const creatorBag = {
-        
-    }
-    const bag = {
-        ...creatorBag,
         ...handlers
     }
     return bag;
