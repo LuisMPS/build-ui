@@ -1,6 +1,6 @@
 import {shallowEqual, useSelector} from "react-redux";
 import {getTree} from "../../selectors"
-import {getChildrenById, getParentsById, getDirectChildrenById, getMultipleById, getMultipleIndexesForId, getMultipleMetaById, getMultipleByIndex} from "../../selectors/tree"
+import {getChildrenById, getParentsById, getDirectChildrenById, getMultipleById, getMultipleIndexesForId, getMultipleMetaById, getMultipleByIndex, getMultipleByFilter} from "../../selectors/tree"
 import {deepEqual, keys, values} from "../../utils/object";
 
 const selectMultipleById = (...id) => store => (
@@ -8,6 +8,9 @@ const selectMultipleById = (...id) => store => (
 );
 const selectMultipleByIndex = index => store => (
     getMultipleByIndex(getTree(store), index)
+);
+const selectMultipleByFilter = filter => store => (
+    getMultipleByFilter(getTree(store), filter)
 );
 const selectParentsById = id => store => (
     getParentsById(getTree(store), id)
@@ -25,6 +28,7 @@ const useMultiCollector = ({
     const selectors = {
         selectMultipleById,
         selectMultipleByIndex,
+        selectMultipleByFilter,
         selectParentsById,
         selectChildrenById,
         selectDirectChildrenById,
