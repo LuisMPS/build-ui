@@ -6,6 +6,7 @@ import useCollector from "../collectors/useCollector";
 import useMultiCollector from '../collectors/useMultiCollector';
 import useActions from "../useActions";
 import useDnD from "./useDnD";
+import useDnDHelpers from "./useDnDHelpers";
 
 const useNodeDnD = ({
     initialTransferType,
@@ -53,6 +54,9 @@ const useNodeDnD = ({
     const setTransferType = (
         dnd.setTransferType
     );
+    const helpers = useDnDHelpers({
+        transferType: transferType,
+    });
     const actions = useActions();
     function triggerDragStart(drag) {
         dnd.triggerDragStartMove({
@@ -79,40 +83,6 @@ const useNodeDnD = ({
             cancel: cancel,
         }
     }
-    function getDragAndDrop() {
-        const data = getTransferData(transfer);
-        // In case drop is not
-        // caused by an internal
-        // action, such as dropping
-        // a file or image. Or when
-        // there is no active current
-        // drag and drop action.
-        if (!data) return null;
-        const meta = getTransferMeta(transfer);
-        const create = meta.create;
-        if (create) return getDragAndDropCreate();
-        if (!create) return getDragAndDropMove();
-    }
-    function getDragAndDropCreate() {
-        const data = getTransferData(transfer);
-        const meta = getTransferMeta(transfer);
-        const rootId = data.root;
-        const root = data.byIds[rootId];
-        const bagDnD = {
-            transfer: root,
-            meta: meta,
-        }
-        return bagDnD;
-    }
-    function getDragAndDropMove() {
-        const moved = getTransferData(transfer);
-        const meta = getTransferMeta(transfer);
-        const bagDnD = {
-            transfer: moved,
-            meta: meta,
-        }
-        return bagDnD;
-    }
     function handleDrop(event, position = null) {
         const data = getTransferData(transfer);
         // In case drop is not
@@ -133,7 +103,7 @@ const useNodeDnD = ({
         };
         const dropBag = {
             event: event,
-            ...getDragAndDrop(),
+            ...helpers.getDragAndDrop(),
         }
         const onDropBag = {
             cancelled: drop.cancelled,
@@ -163,7 +133,7 @@ const useNodeDnD = ({
         if (drop.cancelled) {
             return;
         }
-        actions.triggerCreate({
+        actions.timeBatched.triggerCreate({
             targetId: id,
             node: data,
             position: position,
@@ -182,7 +152,7 @@ const useNodeDnD = ({
         };
         const dropBag = {
             event: event,
-            ...getDragAndDrop(),
+            ...helpers.getDragAndDrop(),
         }
         const onDropBag = {
             cancelled: drop.cancelled,
@@ -211,7 +181,7 @@ const useNodeDnD = ({
         if (drop.cancelled) {
             return;
         }
-        actions.triggerMove({
+        actions.timeBatched.triggerMove({
             id: moved.id,
             targetId: id,
             position: position,
@@ -219,13 +189,13 @@ const useNodeDnD = ({
         onDropDone(dropBag);
     }
     function handleChildYDrop(event, position) {
-        const {top} = getDnDEventPosition(event);
+        const {top} = helpers.getDnDEventPosition(event);
         const offset = top ? 0 : 1;
         const dropPosition = position + offset;
         handleDrop(event, dropPosition);
     }
     function handleChildXDrop(event, position) {
-        const {left} = getDnDEventPosition(event);
+        const {left} = helpers.getDnDEventPosition(event);
         const offset = left ? 0 : 1;
         const dropPosition = position + offset;
         handleDrop(event, dropPosition);
@@ -237,52 +207,6 @@ const useNodeDnD = ({
     function handleDragEnd() {
         triggerDragEnd();
     }
-    function getDnDEventPosition(event) {
-        // In case event target is not 
-        // an HTMLElement, must watch for
-        // event target, since position
-        // will be calculated with 
-        // getBoundingClientRect function. 
-        const getDnDEventTarget = event => (
-            event.currentTarget === document 
-            ? event.target
-            : event.currentTarget
-        );
-        const eventX = (
-            event.clientX ||
-            (event.changedTouches &&  
-            event.changedTouches[0].clientX) ||
-            (event.touces &&  
-            event.touches[0].clientX)
-        );
-        const eventY = (
-            event.clientY || 
-            (event.changedTouches &&  
-            event.changedTouches[0].clientY) ||
-            (event.touces &&
-            event.touches[0].clientY)
-        );
-        const target = getDnDEventTarget(event);
-        const {
-            top, height,
-            left, width,
-        } = target.getBoundingClientRect();
-        const centerX = left + width / 2;
-        const centerY = top + height / 2;
-        return {
-            top: centerY > eventY,
-            bottom: centerY <= eventY,
-            left: centerX > eventX,
-            right: centerX <= eventX,
-        }
-    }
-    const isTransfering = Boolean(
-        transfer.data
-    );
-    const isTransferingType = (
-        isTransfering && 
-        transfer.type === transferType
-    );
     const dndBag = {
         transferType: transferType,
         onDrop: onDrop,
@@ -302,16 +226,11 @@ const useNodeDnD = ({
         triggerDragStart,
         triggerDragEnd,
     }
-    const utils = {
-        getDnDEventPosition,
-        isTransfering: isTransfering,
-        isTransferingType: isTransferingType,
-    }
     const bag = {
         ...dndBag,
         ...handlers,
         ...triggers,
-        ...utils,
+        ...helpers,
     }
     return bag;
 }
