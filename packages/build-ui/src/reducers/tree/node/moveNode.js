@@ -10,8 +10,8 @@ function moveNode(state, action) {
     const {id, targetId, position} = action.payload;
     const parent = getParentNode(state, id);
     const target = getNodeById(state, targetId);
-    const parentChildIds = parent?.childIds;
-    const from = parentChildIds?.indexOf(id);
+    const parentChildIds = parent.childIds;
+    const from = parentChildIds.indexOf(id);
     const targetChildIds = target.childIds;
     const insertPos = isDefined(position)
         ? position
