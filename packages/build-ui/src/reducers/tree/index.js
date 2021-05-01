@@ -10,7 +10,6 @@ import rewriteNode from './node/rewriteNode';
 import createMeta from './meta/createMeta';
 import deleteMeta from './meta/deleteMeta';
 import updateMeta from './meta/updateMeta';
-import resetMeta from './meta/resetMeta';
 
 import createIndex from './index/createIndex';
 import deleteIndex from './index/deleteIndex';
@@ -37,7 +36,6 @@ export {
     createMeta,
     deleteMeta,
     updateMeta,
-    resetMeta,
     // Setting reducers
     createIndex,
     deleteIndex,
