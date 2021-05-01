@@ -17,7 +17,6 @@ function moveNode(state, action) {
         ? position
         : targetChildIds.length;
     // State mutations (Order is important)
-    if (parentChildIds && from !== -1) 
     state.byIds[parent.id].childIds.splice(from, 1);
     state.byIds[targetId].childIds.splice(insertPos, 0, id);
     state.byIds[id].parentId = targetId;
