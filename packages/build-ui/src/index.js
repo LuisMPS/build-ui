@@ -14,6 +14,7 @@ import useBuilder from './hooks/useBuilder'
 import useCollector from './hooks/collectors/useCollector'
 import useMultiCollector from './hooks/collectors/useMultiCollector'
 
+import useDnDHelpers from './hooks/dnd/useDnDHelpers';
 import useNodeDnD from './hooks/dnd/useNodeDnD';
 import useToolDnD from './hooks/dnd/useToolDnD';
 
@@ -32,6 +33,7 @@ export {
     useBuilder,
     useCollector,
     useMultiCollector,
+    useDnDHelpers,
     useNodeDnD,
     useToolDnD,
     branch,
