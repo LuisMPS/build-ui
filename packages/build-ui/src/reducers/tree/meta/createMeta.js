@@ -1,13 +1,13 @@
-function startMeta(state, action) {
+function createMeta(state, action) {
     const {meta} = action.payload;
     // State mutation
     Object.entries(meta).map(([id, v]) => {
-        state.meta[id] = v || {};
+        state.meta[id] = v;
     });
 }
 
 const reducer = {
-    reducer: startMeta,
+    reducer: createMeta,
 }
 
 export default reducer;
