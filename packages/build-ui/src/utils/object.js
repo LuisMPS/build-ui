@@ -15,7 +15,7 @@ export const getIn = (
     obj,
     key,
     fallback,
-    p
+    p = 0
 ) => {
     const path = toPath(key);
     while (obj && p < path.length) {
@@ -110,17 +110,9 @@ export function values(object) {
 export function entries(object) {
     return Object.entries(object);
 }
-
-function is(x, y) {
-    if (x === y) {
-      return x !== 0 || y !== 0 || 1 / x === 1 / y
-    } else {
-      return x !== x && y !== y
-    }
-}
   
 export function deepEqual(objA, objB) {
-    if (is(objA, objB)) return true
+    if (objA === objB) return true
   
     if (
       typeof objA !== 'object' ||
