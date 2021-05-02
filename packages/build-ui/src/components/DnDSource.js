@@ -43,7 +43,6 @@ const DnDSource = ({
         onDragOver(event);
     }
     const handleDropMouse = event => {
-        event.dropTarget = box.current;
         onDrop(event);
     }
     const handleDragStartTouch = event => {
@@ -120,30 +119,68 @@ const DnDSource = ({
         );
         return insideBounds;
     }, []);
+    // This callback makes document 
+    // attached event listeners to 
+    // provide a similar interface to 
+    // those listeners attached to React 
+    // Elements, i.e. provide same event 
+    // interface for mouse events and
+    // touch events. 
+    const mutateDOMEvent = useCallback(event => {
+        Object.defineProperty(
+            event, 
+            'stopPropagation',
+            {value: event.stopImmediatePropagation,
+            configurable: true},
+        )
+        Object.defineProperty(
+            event, 
+            'currentTarget',
+            {value: box.current, 
+            configurable: true},
+        );
+    }, []);
     useEffect(() => {
         if (!isDragging || !allowTouch) return;
-        const handleToggle = inside => {
-            if (inside) batch(() => onDragEnter());
-            if (!inside) batch(() => onDragLeave());
-            insideBox.current = inside;
-        }
         const handleTouchOver = event => {
             const clientX = event.touches[0].clientX;
             const clientY = event.touches[0].clientY;
             const insidePrev = insideBox.current;
             const insideNow = isInsideBounds(clientX, clientY);
-            if (insidePrev !== insideNow) handleToggle(insideNow);
-            if (!insideNow) return;
-            batch(() => onDragOver(event)); 
+            if (!insideNow && insidePrev === insideNow) return;
+            // Mutate DOM Event before
+            // calling listeners to 
+            // provide interface.
+            mutateDOMEvent(event);
+            // To handle drag enter and 
+            // drag leave since inside bounds
+            // value changed from previous
+            // touchmove inside bounds.
+            if (insidePrev !== insideNow) {
+                if (insideNow) batch(() => onDragEnter(event));
+                if (!insideNow) batch(() => onDragLeave(event));
+                insideBox.current = insideNow;
+            }
+            // To handle drag over since
+            // touch move is currently 
+            // inside bounds.
+            if (insideNow) {
+                batch(() => onDragOver(event)); 
+            };
         }
         const handleTouchUp = event => {
             const clientX = event.changedTouches[0].clientX;
             const clientY = event.changedTouches[0].clientY;
-            const inside = isInsideBounds(clientX, clientY);
-            if (inside) {
-                event.dropTarget = box.current;
-                batch(() => onDrop(event));
-            }
+            const insideNow = isInsideBounds(clientX, clientY);
+            if (!insideNow) return 
+            // Mutate DOM Event before
+            // calling listener to 
+            // provide interface
+            mutateDOMEvent(event);
+            // To handle drop since
+            // touch end was done
+            // inside bounds.
+            batch(() => onDrop(event));
         }
         document.addEventListener(
             'touchmove',
@@ -171,6 +208,7 @@ const DnDSource = ({
         onDragOver,
         onDrop,
         isInsideBounds,
+        mutateDOMEvent,
         isDragging,
         allowTouch,
     ]);
@@ -201,6 +239,7 @@ const DnDSource = ({
         }
     }, [
         onDragEnd,
+        mutateDOMEvent,
     ]);
     function getMouseEventHandlers() {
         const passiveHandlers = {
