@@ -5,11 +5,12 @@ import {render, screen, fireEvent} from '@testing-library/react';
 import '@testing-library/jest-dom';
 
 import Builder from '../../components/Builder';
-import ChildrenDrop from '../../components/ChildrenDrop';
+import ChildrenDropListener from '../../components/ChildrenDropListener';
 import {startTransfer} from '../../slices/transfer';
 
 const ChildrenDropTestComponent = ({
     transfering = false,
+    transferType,
 }) => {
     const dispatch = useDispatch();
     useEffect(() => {
@@ -17,13 +18,13 @@ const ChildrenDropTestComponent = ({
         dispatch(startTransfer({
             data: true,
             meta: true,
-            type: 'builder',
+            type: transferType,
         }));
     });
     return null;
 }
 
-describe('<ChildrenDrop />', () => {
+describe('<ChildrenDropListener />', () => {
 
     describe('should throw errors', () => {
 
@@ -45,7 +46,7 @@ describe('<ChildrenDrop />', () => {
         test('should throw error when no children are provided', () => {
             expect(() => {
                 render(<Builder>
-                    <ChildrenDrop />
+                    <ChildrenDropListener />
                 </Builder>);
             }).toThrowError();
         });
@@ -54,10 +55,10 @@ describe('<ChildrenDrop />', () => {
 
     test('should pass down props to children components wrappers', () => {
         render(<Builder>
-            <ChildrenDrop data-testid = 'drops'>
+            <ChildrenDropListener data-testid = 'drops'>
                 <div>Child_1</div>
                 <div>Child_2</div>
-            </ChildrenDrop>
+            </ChildrenDropListener>
         </Builder>);
         const wrappers = screen.getAllByTestId('drops');
         expect(wrappers).toHaveLength(2);
@@ -66,16 +67,20 @@ describe('<ChildrenDrop />', () => {
     test('should call onDrop with correct position', () => {
         const handleDrop = jest.fn();
         render(<Builder>
-            <ChildrenDropTestComponent transfering = {true} />
-            <ChildrenDrop 
+            <ChildrenDropTestComponent 
+                transfering = {true} 
+                transferType = 'builder'
+            />
+            <ChildrenDropListener
                 onDrop = {handleDrop}
+                listenTransferType = 'builder'
                 data-testid = 'drops'
             >
                 <div>Child_0</div>
                 <div>Child_1</div>
                 <div>Child_2</div>
                 <div>Child_3</div>
-            </ChildrenDrop>
+            </ChildrenDropListener>
         </Builder>);
         const wrappers = screen.getAllByTestId('drops');
         const last_wrapper_position = 3;

@@ -1,7 +1,7 @@
 import React from 'react';
-import DnDBuilder from './DnDBuilder';
+import DnDListener from './DnDListener';
 
-const ChildrenDrop = ({
+const ChildrenDropListener = ({
     children,
     onDrop,
     ...props
@@ -10,14 +10,14 @@ const ChildrenDrop = ({
         (child, index) => {
         const handleDrop = pos => e => onDrop(e, pos);
         return <React.Fragment>
-            <DnDBuilder
+            <DnDListener
                 onDrop = {handleDrop(index)}
                 {...props}
             >
             {child}
-            </DnDBuilder>
+            </DnDListener>
         </React.Fragment>
     });
 }
 
-export default ChildrenDrop;
+export default ChildrenDropListener;

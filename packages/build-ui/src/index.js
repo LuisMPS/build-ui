@@ -1,6 +1,7 @@
 import Builder from './components/Builder'
 import Workspace from './components/Workspace'
-import ChildrenDrop from './components/ChildrenDrop'
+import ChildrenDropListener from './components/ChildrenDropListener'
+import ChildrenDropBuilder from './components/ChildrenDropBuilder'
 import Panel from './components/Panel'
 
 import DnDBuilder from './components/DnDBuilder';
@@ -23,7 +24,8 @@ import {branch, item, itemid} from './utils/tree'
 export {
     Builder,
     Workspace,
-    ChildrenDrop,
+    ChildrenDropListener,
+    ChildrenDropBuilder,
     Panel,
     DnDBuilder,
     DnDListener,
