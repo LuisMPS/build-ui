@@ -37,7 +37,11 @@ export default {
         },
     ],
     external: id => {
-        return !id.startsWith('.') && !path.isAbsolute(id)
+        return (
+            (!id.startsWith('.') && 
+            !path.isAbsolute(id)) ||
+            id.includes('@babel/runtime')
+        );
     },
     plugins: [
         nodeResolve(),
@@ -57,7 +61,7 @@ export default {
                 '@babel/plugin-proposal-class-properties',
                 '@babel/plugin-proposal-object-rest-spread',
             ],
-            babelHelpers: 'bundled'
+            babelHelpers: 'runtime'
         }),
     ],
 };
