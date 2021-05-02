@@ -267,12 +267,11 @@ describe('useNodeDnD', () => {
                 }]
             });
             // Mutate event directly
-            // to set currentTarget and
-            // target property to mock HTML
+            // to set currentTarget
+            // property to mock HTML
             // element since it is not
             // bound by jsdom automatically.
-            Object.defineProperty(dropEvent, 'currentTarget', {value: document});
-            Object.defineProperty(dropEvent, 'target', {value: mockElement});
+            Object.defineProperty(dropEvent, 'currentTarget', {value: mockElement});
             // Matcher definition
             expect(dnd.getDnDEventPosition(dropEvent)).toEqual({
                 top: true,

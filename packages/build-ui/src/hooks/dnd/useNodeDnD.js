@@ -125,10 +125,7 @@ const useNodeDnD = ({
             drop.explicitCancel
         );
         if (stopEvent) {
-            // For mouse events
-            if (event.nativeEvent) event.stopPropagation();
-            // For touch events
-            else event.stopImmediatePropagation();
+            event.stopPropagation();
         }
         if (drop.cancelled) {
             return;
@@ -173,10 +170,7 @@ const useNodeDnD = ({
             drop.explicitCancel
         );
         if (stopEvent) {
-            // For mouse events
-            if (event.nativeEvent) event.stopPropagation();
-            // For touch events
-            else event.stopImmediatePropagation();
+            event.stopPropagation();
         }
         if (drop.cancelled) {
             return;

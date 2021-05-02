@@ -7,7 +7,7 @@ import {TreeTestComponent, ViewTestComponent} from './test-components';
 import Builder from '../../components/Builder';
 import DnDBuilder from '../../components/DnDBuilder';
 import Workspace from '../../components/Workspace';
-import ChildrenDrop from '../../components/ChildrenDrop';
+import ChildrenDropBuilder from '../../components/ChildrenDropBuilder';
 import useEditor from '../../hooks/useEditor';
 import {branch, item, itemid} from '../../utils/tree';
 
@@ -41,13 +41,13 @@ const EditorHookDnDTestComponent = ({
         onDrop = {editor.handleDrop}
         data-testid = {builder_testid}
     >
-        <ChildrenDrop 
+        <ChildrenDropBuilder
             {...props} 
             onDrop = {handleChildDrop}
             data-testid = {drop_testid}
         >
             {children}
-        </ChildrenDrop>
+        </ChildrenDropBuilder>
     </DnDBuilder>
 }
 

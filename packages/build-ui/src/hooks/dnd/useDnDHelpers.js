@@ -10,17 +10,7 @@ const useDnDHelpers = params => {
         transferSelector,
         shallowEqual,
     );
-    function getDnDEventPosition(event) {
-        // In case event target is not 
-        // an HTMLElement, must watch for
-        // event target, since position
-        // will be calculated with 
-        // getBoundingClientRect function. 
-        const getDnDEventTarget = event => (
-            event.currentTarget === document 
-            ? event.target
-            : event.currentTarget
-        );
+    function getDnDEventPosition(event) { 
         const eventX = (
             event.clientX ||
             (event.changedTouches &&  
@@ -35,7 +25,7 @@ const useDnDHelpers = params => {
             (event.touces &&
             event.touches[0].clientY)
         );
-        const target = getDnDEventTarget(event);
+        const target = event.currentTarget;
         const {
             top, height,
             left, width,
@@ -61,7 +51,7 @@ const useDnDHelpers = params => {
         const meta = getTransferMeta(transfer);
         const create = meta.create;
         if (create) return getDragAndDropCreate();
-        if (!create) return getDragAndDropMove();
+        else return getDragAndDropMove();
     }
     function getDragAndDropCreate() {
         const data = getTransferData(transfer);
