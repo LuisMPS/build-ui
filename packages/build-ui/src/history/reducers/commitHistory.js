@@ -9,7 +9,7 @@ export default function commitHistory(state, action) {
     const batch = state.batch;
     const past = batch.past;
     const patches = batch.patches;
-    const [_, redo = [], undo = []] = (
+    const [, redo, undo] = (
         produceWithPatches(past, draft => {
             applyPatches(draft, patches);
         })
@@ -19,14 +19,14 @@ export default function commitHistory(state, action) {
     const limitExceeded = version + 1 > historyLimit;
     // State mutations
     state.batch.patches = [];
-    if (redo.length === 0) return;
+    state.batch.past = null;
+    if (!redo || redo.length === 0) return;
     state.history.timeline.length = state.history.version;
     if (limitExceeded) {
         state.history.timeline.shift();
     }
     state.history.timeline.push({undo: undo, redo: redo});
-    state.history.version += !limitExceeded ? 1 : 0;
-    state.batch.past = null;
+    state.history.version = state.history.timeline.length;
 }
 
 
