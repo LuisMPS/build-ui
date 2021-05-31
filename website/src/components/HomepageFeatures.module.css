@@ -1,0 +1,18 @@
+/* stylelint-disable docusaurus/copyright-header */
+
+.features {
+    display: flex;
+    align-items: center;
+    padding: 2rem 0;
+    width: 100%;
+}
+
+.featureSvg {
+    height: 200px;
+    width: 200px;
+    fill: #9980c2;
+    transition: fill 200ms cubic-bezier(0.4, 0, 0.2, 1) 0ms;
+    display: inline-block;
+    font-size: 100rem;
+    flex-shrink: 0;
+}
