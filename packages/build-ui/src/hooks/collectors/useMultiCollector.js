@@ -12,13 +12,13 @@ const selectMultipleByIndex = index => store => (
 const selectMultipleByFilter = filter => store => (
     getMultipleByFilter(getTree(store), filter)
 );
-const selectParentsById = id => store => (
+const selectParents = id => store => (
     getParentsById(getTree(store), id)
 );
-const selectChildrenById = id => store => (
+const selectChildren = id => store => (
     getChildrenById(getTree(store), id)
 );
-const selectDirectChildrenById = id => store => (
+const selectDirectChildren = id => store => (
     getDirectChildrenById(getTree(store), id)
 );
 
@@ -29,9 +29,9 @@ const useMultiCollector = ({
         selectMultipleById,
         selectMultipleByIndex,
         selectMultipleByFilter,
-        selectParentsById,
-        selectChildrenById,
-        selectDirectChildrenById,
+        selectParents,
+        selectChildren,
+        selectDirectChildren,
     };
     const chosen = selector(selectors) 
     const nodes = useSelector(
@@ -51,7 +51,8 @@ const useMultiCollector = ({
         )
     );
     const meta = useSelector(
-        metaSelector
+        metaSelector,
+        shallowEqual,
     );
     function listMeta() {
         return values(meta);
