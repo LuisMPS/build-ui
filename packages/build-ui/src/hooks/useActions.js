@@ -179,78 +179,94 @@ const useActions = () => {
     }
     // Batched actions
     function triggerCreateBatched(create) {
+        batcher.abort();
         creator.handleCreateBatched(create);
     }
     function triggerDeleteBatched(deleted) {
+        batcher.abort();
         deleter.handleDeleteBatched(deleted);
     }
     function triggerMoveBatched(move) {
+        batcher.abort();
         dispatch(moveNodeBatched(
             movePayload(move)
         ));
     }
     function triggerShiftBatched(shift) {
+        batcher.abort();
         dispatch(intershiftNodeBatched(
             shiftPayload(shift)
         ));
     }
     function triggerUpdateBatched(update) {
+        batcher.abort();
         dispatch(updateNodeBatched(
             updatePayload(update)
         ));
     }
     function triggerRewriteBatched(rewrite) {
+        batcher.abort();
         dispatch(rewriteNodeBatched(
             rewritePayload(rewrite)
         ));
     }
     function triggerMetaUpdateBatched(update) {
+        batcher.abort();
         dispatch(updateMetaBatched(
             metaUpdatePayload(update)
         ));
     }
     function triggerIndexAddBatched(add) {
+        batcher.abort();
         dispatch(addIndexBatched(
             indexAddPayload(add)
         ));
     }
     function triggerListIndexAddBatched(add) {
+        batcher.abort();
         dispatch(addListIndexBatched(
             listIndexAddPayload(add)
         ));
     }
     function triggerIndexRemoveBatched(remove) {
+        batcher.abort();
         dispatch(removeIndexBatched(
             indexRemovePayload(remove)
         ));
     }
     function triggerListIndexRemoveBatched(remove) {
+        batcher.abort();
         dispatch(removeListIndexBatched(
             listIndexRemovePayload(remove)
         ));
     }
     function triggerIndexToggleBatched(toggle) {
+        batcher.abort();
         dispatch(toggleIndexBatched(
             indexTogglePayload(toggle)
         ));
     }
     function triggerListIndexToggleBatched(toggle) {
+        batcher.abort();
         dispatch(toggleListIndexBatched(
             listIndexTogglePayload(toggle)
         ));
     }
     function triggerIndexClearBatched(clear) {
+        batcher.abort();
         dispatch(clearIndexBatched(
             indexClearPayload(clear)
         ));
     }
     function triggerListIndexClearBatched(clear) {
+        batcher.abort();
         dispatch(clearListIndexBatched(
             listIndexClearPayload(clear)
         ));
     }
     // Unbatched actions
     function triggerCreateUnbatched(create) {
+        batcher.abort();
         creator.handleCreateBatched(create);
         // Dispatch commit history
         // directly after batching
@@ -259,74 +275,88 @@ const useActions = () => {
         dispatch(commitHistory({}))
     }
     function triggerDeleteUnbatched(deleted) {
+        batcher.abort();
         deleter.handleDeleteBatched(deleted)
-         // Dispatch commit history
+        // Dispatch commit history
         // directly after batching
         // delete actions to simulate
         // unbatched action.
         dispatch(commitHistory({}))
     }
     function triggerMoveUnbatched(move) {
+        batcher.abort();
         dispatch(moveNodeUnbatched(
             movePayload(move)
         ));
     }
     function triggerShiftUnbatched(shift) {
+        batcher.abort();
         dispatch(intershiftNodeUnbatched(
             shiftPayload(shift)
         ));
     }
     function triggerUpdateUnbatched(update) {
+        batcher.abort();
         dispatch(updateNodeUnbatched(
             updatePayload(update)
         ));
     }
     function triggerRewriteUnbatched(rewrite) {
+        batcher.abort();
         dispatch(rewriteNodeUnbatched(
             rewritePayload(rewrite)
         ));
     }
     function triggerMetaUpdateUnbatched(update) {
+        batcher.abort();
         dispatch(updateMetaUnbatched(
             metaUpdatePayload(update)
         ));
     }
     function triggerIndexAddUnbatched(add) {
+        batcher.abort();
         dispatch(addIndexUnbatched(
             indexAddPayload(add)
         ));
     }
     function triggerListIndexAddUnbatched(add) {
+        batcher.abort();
         dispatch(addListIndexUnbatched(
             listIndexAddPayload(add)
         ));
     }
     function triggerIndexRemoveUnbatched(remove) {
+        batcher.abort();
         dispatch(removeIndexUnbatched(
             indexRemovePayload(remove)
         ));
     }
     function triggerListIndexRemoveUnbatched(remove) {
+        batcher.abort();
         dispatch(removeListIndexUnbatched(
             listIndexRemovePayload(remove)
         ));
     }
     function triggerIndexToggleUnbatched(toggle) {
+        batcher.abort();
         dispatch(toggleIndexUnbatched(
             indexTogglePayload(toggle)
         ));
     }
     function triggerListIndexToggleUnbatched(toggle) {
+        batcher.abort();
         dispatch(toggleListIndexUnbatched(
             listIndexTogglePayload(toggle)
         ));
     }
     function triggerIndexClearUnbatched(clear) {
+        batcher.abort();
         dispatch(clearIndexUnbatched(
             indexClearPayload(clear)
         ));
     }
     function triggerListIndexClearUnbatched(clear) {
+        batcher.abort();
         dispatch(clearListIndexUnbatched(
             listIndexClearPayload(clear)
         ));
@@ -403,6 +433,11 @@ const useActions = () => {
             listIndexClearPayload(clear)
         ));
     }
+    // History actions
+    function triggerCommit() {
+        batcher.abort();
+        dispatch(commitHistory({}));
+    }
     const timeBatched = {
         triggerCreate: triggerCreateTimeBatched,
         triggerDelete: triggerDeleteTimeBatched,
@@ -471,11 +506,15 @@ const useActions = () => {
         triggerListIndexToggle: triggerListIndexToggleUnrecorded,
         triggerListIndexClear: triggerListIndexClearUnrecorded,
     }
+    const history = {
+        triggerCommit: triggerCommit
+    }
     const triggers = {
         timeBatched: timeBatched,
         batched: batched,
         unbatched: unbatched,
         unrecorded: unrecorded,
+        history: history,
     }
     const bag = {
         ...triggers,
