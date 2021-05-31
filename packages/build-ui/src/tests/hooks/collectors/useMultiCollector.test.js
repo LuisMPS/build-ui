@@ -80,7 +80,7 @@ describe('useMulticollector', () => {
 
         test('should collect correctly with parents selector', () => {
             const selector = selectors => (
-                selectors.selectParentsById(id_3)
+                selectors.selectParents(id_3)
             );
             const hook = renderHook(() => useMultiCollector({
                 selector: selector
@@ -127,7 +127,7 @@ describe('useMulticollector', () => {
 
         test('should collect correctly with children', () => {
             const selector = selectors => (
-                selectors.selectChildrenById(id_2)
+                selectors.selectChildren(id_2)
             );
             const hook = renderHook(() => useMultiCollector({
                 selector: selector
@@ -138,7 +138,7 @@ describe('useMulticollector', () => {
 
         test('should collect correctly with direct children', () => {
             const selector = selectors => (
-                selectors.selectDirectChildrenById(id_1)
+                selectors.selectDirectChildren(id_1)
             );
             const hook = renderHook(() => useMultiCollector({
                 selector: selector

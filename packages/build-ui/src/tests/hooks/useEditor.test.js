@@ -7,7 +7,6 @@ import {TreeTestComponent, ViewTestComponent} from './test-components';
 import Builder from '../../components/Builder';
 import DnDBuilder from '../../components/DnDBuilder';
 import Workspace from '../../components/Workspace';
-import ChildrenDropBuilder from '../../components/ChildrenDropBuilder';
 import useEditor from '../../hooks/useEditor';
 import {branch, item, itemid} from '../../utils/tree';
 
@@ -19,7 +18,7 @@ const EditorHookDnDTestComponent = ({
     children = [],
     ...props
 }) => {
-    const initialOnDrop = ({
+    const onDrop = ({
         transfer,
         cancel,
     }) => {
@@ -28,7 +27,7 @@ const EditorHookDnDTestComponent = ({
     }
     const editor = useEditor({
         id: id,
-        initialOnDrop: initialOnDrop,
+        onDrop: onDrop,
     });
     const handleChildDrop = (
         horizontal 
@@ -40,15 +39,10 @@ const EditorHookDnDTestComponent = ({
         onDragEnd = {editor.handleDragEnd}
         onDrop = {editor.handleDrop}
         data-testid = {builder_testid}
+        {...props}
     >
-        <ChildrenDropBuilder
-            {...props} 
-            onDrop = {handleChildDrop}
-            data-testid = {drop_testid}
-        >
-            {children}
-        </ChildrenDropBuilder>
-    </DnDBuilder>
+        {children}
+      </DnDBuilder>
 }
 
 const EditorHookUtilTestComponent = ({
@@ -198,102 +192,6 @@ describe('useEditor', () => {
 
         afterEach(() => {
             onTree.mockReset();
-        });
-
-        test('should provide handleDrag* and handleDrop supporting typical DnD', () => {
-            render(<Builder initialTree = {initialTree}>
-                <Workspace view = {view} />
-                <TreeTestComponent onTree = {onTree} />
-            </Builder>);      
-            const builder_1 = screen.getByTestId('builder_1');
-            const builder_3 = screen.getByTestId('builder_3');
-            fireEvent.dragStart(builder_1);
-            fireEvent.drop(builder_3);
-            fireEvent.dragEnd(builder_1);
-            expect(getTree().byIds[id_1].parentId).toBe(id_3);
-            expect(getTree().byIds[id_3].childIds).toContain(id_1);
-        });
-
-        test('should provide handleDrop supporting recursive DnD', () => {
-            render(<Builder initialTree = {initialTree}>
-                <Workspace view = {view} />
-                <TreeTestComponent onTree = {onTree} />
-            </Builder>);      
-            const builder_1 = screen.getByTestId('builder_1');
-            const builder_2 = screen.getByTestId('builder_2');
-            fireEvent.dragStart(builder_1);
-            fireEvent.drop(builder_2);
-            fireEvent.dragEnd(builder_1);
-            expect(getTree().byIds[id_1].parentId).not.toBe(id_2);
-            expect(getTree().byIds[id_2].childIds).not.toContain(id_1);
-        });
-
-        test('should provide handleChildXDrop for positioned X drops', () => {
-            render(<Builder initialTree = {initialTree}>
-                <Workspace view = {view} />
-                <TreeTestComponent onTree = {onTree} />
-            </Builder>);      
-            const builder_drop = screen.getByTestId('drop_1');
-            const builder_3 = screen.getByTestId('builder_3');
-            const {top, left, width, height} = builder_drop.getBoundingClientRect();
-            fireEvent.dragStart(builder_3);
-            const dropEvent = createEvent.drop(builder_drop);
-            // Mutate event directly since
-            // jsdom (react testing library?)
-            // does not support setting event
-            // position in options, as it does
-            // for other events.
-            dropEvent.clientX = left + width / 4;
-            dropEvent.clientY = top + height / 4;
-            fireEvent(builder_drop, dropEvent);
-            fireEvent.dragEnd(builder_3);
-            expect(getTree().byIds[id_3].parentId).toBe(id_1);
-            // Should have inserted at first 
-            // position (i.e. before child
-            // because simulated drop was on
-            // leftmost position of child).
-            expect(getTree().byIds[id_1].childIds[0]).toBe(id_3);
-        });
-
-        test('should provide handleChildYDrop for positioned Y drops', () => {
-            render(<Builder initialTree = {initialTree}>
-                <Workspace view = {view} />
-                <TreeTestComponent onTree = {onTree} />
-            </Builder>);      
-            const builder_drop = screen.getByTestId('drop_2');
-            const builder_1 = screen.getByTestId('builder_1');
-            const {top, left, width, height} = builder_drop.getBoundingClientRect();
-            fireEvent.dragStart(builder_1);
-            const dropEvent = createEvent.drop(builder_drop);
-            // Mutate event directly since
-            // jsdom (react testing library?)
-            // does not support setting event
-            // position in options, as it does
-            // for other events.
-            dropEvent.clientX = left + 3 * width / 4;
-            dropEvent.clientY = top + 3 * height / 4;
-            fireEvent(builder_drop, dropEvent);
-            fireEvent.dragEnd(builder_1);
-            expect(getTree().byIds[id_1].parentId).toBe(id_3);
-            // Should have inserted at second 
-            // position (i.e. after child
-            // because simulated drop was on lower
-            // position of child).
-            expect(getTree().byIds[id_3].childIds[1]).toBe(id_1);
-        });
-
-        test('should accept onDrop function to cancel drops', () => {
-            render(<Builder initialTree = {initialTree}>
-                <Workspace view = {view} />
-                <TreeTestComponent onTree = {onTree} />
-            </Builder>);      
-            const builder = screen.getByTestId('builder_1');
-            const builder_cancel = screen.getByTestId('builder_cancel');
-            fireEvent.dragStart(builder_cancel);
-            fireEvent.drop(builder);
-            fireEvent.dragEnd(builder_cancel);
-            expect(getTree().byIds[id_cancel].parentId).not.toBe(id_1);
-            expect(getTree().byIds[id_1].childIds).not.toContain(id_cancel);
         });
 
     });

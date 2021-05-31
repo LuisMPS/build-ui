@@ -128,7 +128,7 @@ describe('useBuilder', () => {
             const input = screen.getByLabelText(/text/i);
             fireEvent.change(input, {target: {value: 'Goodbye'}});
             const undo = screen.getByRole('button', {name: /undo/i});
-            expect(undo).not.toBeDisabled();
+            expect(undo).toBeEnabled();
         });
 
         test('should provide true canRedo when moving back in history', () => {
@@ -146,7 +146,7 @@ describe('useBuilder', () => {
             const undo = screen.getByRole('button', {name: /undo/i});
             fireEvent.click(undo);
             const redo = screen.getByRole('button', {name: /redo/i});
-            expect(redo).not.toBeDisabled();
+            expect(redo).toBeEnabled();
         });
 
         test('should provide false canUndo when moving to 1st version in history', async () => {
@@ -170,9 +170,9 @@ describe('useBuilder', () => {
             // they were committed in 3
             // different batches.
             fireEvent.click(undo);
-            expect(undo).not.toBeDisabled();
+            expect(undo).toBeEnabled();
             fireEvent.click(undo);
-            expect(undo).not.toBeDisabled();
+            expect(undo).toBeEnabled();
             fireEvent.click(undo);
             expect(undo).toBeDisabled();
         });
@@ -197,7 +197,7 @@ describe('useBuilder', () => {
             // they were committed in 3
             // different batches.
             fireEvent.click(undo);
-            expect(redo).not.toBeDisabled();
+            expect(redo).toBeEnabled();
             fireEvent.click(redo);
             expect(redo).toBeDisabled();
         });

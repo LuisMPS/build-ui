@@ -60,48 +60,6 @@ describe('useNodeDnD', () => {
 
     describe('node DnD transfer type', () => {
 
-        test('should use transfer type to handle events when type matches', () => {
-            const handleDrop = jest.fn();
-            render(<Builder initialTree = {initialTree}>
-                <Workspace view = {view} />
-                <DnDListener
-                    listenTransferType = 'test'
-                    onDrop = {handleDrop}
-                >
-                    Listener
-                </DnDListener>
-            </Builder>);
-            const node = screen.getByText(/node/i);
-            const listener = screen.getByText(/listener/i);
-            fireEvent.dragStart(node);
-            fireEvent.drop(listener);
-            fireEvent.dragEnd(node);
-            // Should have called onDrop
-            // in listener component once
-            expect(handleDrop).toHaveBeenCalledTimes(1);
-        });
-
-        test('should use transfer type to ignore events when type does not match', () => {
-            const handleDrop = jest.fn();
-            render(<Builder initialTree = {initialTree}>
-                <Workspace view = {view} />
-                <DnDListener
-                    listenTransferType = 'other'
-                    onDrop = {handleDrop}
-                >
-                    Listener
-                </DnDListener>
-            </Builder>);
-            const node = screen.getByText(/node/i);
-            const listener = screen.getByText(/listener/i);
-            fireEvent.dragStart(node);
-            fireEvent.drop(listener);
-            fireEvent.dragEnd(node);
-            // Should have never called onDrop
-            // in listener component
-            expect(handleDrop).toHaveBeenCalledTimes(0);
-        });
-
     });
 
     describe('node DnD transfer data', () => {
