@@ -1,6 +1,7 @@
 import {useDispatch} from "react-redux";
 import {createNodeBatched, createIndexBatched, createMetaBatched, createNodeUnrecorded, createIndexUnrecorded, createMetaUnrecorded, deleteMetaUnrecorded, deleteMetaBatched, deleteIndexBatched, deleteNodeBatched, deleteIndexUnrecorded, deleteNodeUnrecorded, replaceTreeUnrecorded} from "../slices/tree";
 import {plainBranch} from "../utils/tree";
+import {restartHistory} from "../slices/tree";
 
 const useCreator = () => {
     const dispatch = useDispatch();
@@ -113,6 +114,11 @@ const useReplacer = () => {
         dispatch(replaceTreeUnrecorded({
             tree: tree,
         }));
+        // Restart history after
+        // replacing tree since
+        // tree replacement should 
+        // not be recorded in history.
+        dispatch(restartHistory())
     }
     const handlers = {
         handleReplace: handleReplace,
