@@ -1,7 +1,8 @@
 import toPath from 'lodash/toPath';
 import clone from 'lodash/clone';
-import {isInteger} from './number';
 import {shallowEqual} from 'react-redux';
+import {isInteger} from './number';
+import {isFunction} from './function';
 
 /*
  * Functions below taken from Formik source.
@@ -139,3 +140,34 @@ export function deepEqual(objA, objB) {
     return true
 }
 
+// Function to deep merge 
+// two objects.
+// Mutates Target object.
+export function deepMerge(target, ...sources) {
+    if (!sources.length) return target;
+    const source = sources.shift();
+    if (isObject(target) && isObject(source)) {
+        Object.keys(source).forEach(key => {
+            if (isObject(source[key])) {
+                if (!(key in target))
+                Object.assign(target, { [key]: source[key] });
+                else if (isFunction(target[key]))
+                target[key] = (...args) => deepMerge(target[key](...args), source[key]);
+                else 
+                target[key] = deepMerge(target[key], source[key]);
+            }
+            else if (isFunction(source[key])) {
+              if (!(key in target))
+                Object.assign(target, { [key]: source[key] });
+                else if (isFunction(target[key]))
+                target[key] = (...args) => deepMerge(target[key](...args), source[key](...args));
+                else 
+                target[key] = (...args) => deepMerge(target[key], source[key](...args));
+            } 
+            else {
+                Object.assign(target, { [key]: source[key] });
+            }
+        });
+    }
+    return deepMerge(target, ...sources);
+}
