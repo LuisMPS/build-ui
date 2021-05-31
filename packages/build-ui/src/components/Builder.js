@@ -1,4 +1,4 @@
-import {configureStore, getDefaultMiddleware} from '@reduxjs/toolkit';
+import {configureStore} from '@reduxjs/toolkit';
 import React, {useState} from 'react';
 import {Provider} from 'react-redux';
 import rootReducer from '../slices';
@@ -9,7 +9,6 @@ const Builder = ({
     historyLimit,
     historyBatchTime,
     historyBatchTimeLimit,
-    serializable = true,
     children,
 }) => {
     // Builder component will most likely
@@ -30,9 +29,7 @@ const Builder = ({
         // components, such as functions.
         // Trade-offs include time-traveling
         // debug problems.
-        middleware: getDefaultMiddleware({
-            serializableCheck: serializable,
-        }),
+        middleware: [],
     });
     const [store] = useState(initialStore);
     return <Provider store = {store}>
