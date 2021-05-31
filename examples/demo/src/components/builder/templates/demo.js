@@ -23,7 +23,7 @@ export default {
             "style":{
                "width":"100%",
                "height":"450px",
-               "backgroundColor":"#3e4aab",
+               "backgroundColor":"#151019",
                "position":"absolute",
                "left":"0px",
                "top":"0px",
