@@ -1,3 +1,3 @@
 module.exports = {
-    basePath: '/build-ui/demo',
+    // basePath: '/build-ui/demo',
 }
