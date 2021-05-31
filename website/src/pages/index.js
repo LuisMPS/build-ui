@@ -21,7 +21,7 @@ function HomepageHeader() {
           </Link>
           <Link
             className="button button--secondary button--lg"
-            to={siteConfig.url + "/demo"}>
+            to={siteConfig.url + "/build-ui/demo"}>
             Watch Demo
           </Link>
         </div>

@@ -227,4 +227,4 @@ Remember we used a type string when we created our Counter Tool? We do the same 
 
 Et voilà. We have finished creating a very (very) simple page editor where we can drag and drop limitless counters to our page. How cool is that? Well, not much, really 😛😅. But we are sure you can come up with, and start building much more interesting page builders 😄.
 
-For a much more interesting page builder, go check out our [demo](https://luismps.github.io/demo) live!
+For a much more interesting page builder, go check out our [demo](https://luismps.github.io/build-ui/demo) live!

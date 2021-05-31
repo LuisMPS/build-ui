@@ -72,11 +72,11 @@ function Feature({Svg, title, description}) {
   return (
     <div className={clsx('col col--4')}>
       <div className="text--center">
-        <Svg 
+        {/* <Svg 
           fill='#9980c2'
           className={classes.featureSvg}
           alt={title} 
-        />
+        /> */}
       </div>
       <div className="text--center padding-horiz--md">
         <h3>{title}</h3>
