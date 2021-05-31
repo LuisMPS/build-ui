@@ -1,26 +1,54 @@
-import React, {useCallback, useEffect, useRef, useState} from "react"
+import React, {useEffect, useRef, useState} from "react"
+import useShareRef from "../hooks/useShareRef";
+import useSketchContext from "../hooks/useSketchContext";
+import useEventCallback from "../hooks/events/useEventCallback";
 import {batch} from "react-redux";
 
-const DnDSource = ({
-    onDrop = () => {},
-    onDragEnd = () => {},
-    onDragOver = () => {},
-    onDragStart = () => {},
-    onDragEnter = () => {},
-    onDragLeave = () => {},
+const DnDSource = React.forwardRef(({
+    onDrop,
+    onDragEnd,
+    onDragOver,
+    onDragStart,
+    onDragEnter,
+    onDragLeave,
+    onDragIn,
+    onDragOut,
     allowTouch = true,
-    dragTouchTimeThreshold = 400,
+    dragTouchTimeThreshold = 200,
     // dragTouchMoveThreshold,
     isDragging = false, 
-    children,
+    as = 'div',
     ...rest
-}) => {
-    const box = useRef();
-    const insideBox = useRef(false);
+}, ref) => {
+
+    // Use share ref to both forward
+    // ref to parent component and
+    // to use ref internally.
+    const box = useShareRef(ref);
     const draggingBox = useRef(false);
     const [dragTouchActive, setDragTouchActive] = useState(false);
     const [dragTouchEvent, setDragTouchEvent] = useState(null);
-    const handleDragStartMouse = event => {
+
+    // Warn client if box was not
+    // attached to any DOM node
+    // since it will cause problems.
+
+    useEffect(() => {
+        if (box.current) return;
+        console.warn(`
+            Could not attach ref
+            to underlying DOM node.
+            You should allow ref
+            forwarding in underlying
+            node to attach listeners.
+        `);
+    }, [])
+
+    // Events that go attached to 
+    // this DOM node and trigger
+    // react synthetic events.
+
+    const handleDragStartMouse = useEventCallback(event => {
         event.stopPropagation();
         // Do not start drag operation
         // if there is one currently 
@@ -29,40 +57,57 @@ const DnDSource = ({
         // and mouse down events for drag
         // start).
         if (dragTouchActive) return;
-        onDragStart(event);
+        batch(() => onDragStart(event));
         draggingBox.current = true;
-    }
-    const handleDragEnterMouse = event => {
-        onDragEnter(event);
-    }
-    const handleDragLeaveMouse = event => {
-        onDragLeave(event);
-    }
-    const handleDragOverMouse = event => {
-        event.preventDefault();
-        onDragOver(event);
-    }
-    const handleDropMouse = event => {
-        onDrop(event);
-    }
-    const handleDragStartTouch = event => {
+    });
+
+    const handlePreDragStartTouch = useEventCallback(event => {
         event.stopPropagation();
         // Do not start drag just yet. 
         // Set state to active to
         // let time threshold to 
         // determine whether or not
         // to trigger onDragStart.
-        setDragTouchActive(true);
-        setDragTouchEvent(event);
-    }
-    const handleDragEndTouch = event => {
+        batch(() => {
+            setDragTouchActive(true);
+            setDragTouchEvent(event);
+        });
+    });
+
+    const handleDragStartTouch = useEventCallback(event => {
+        // Must re define currentTarget
+        // because drag start touch is 
+        // handled asynchronously.
+        Object.defineProperty(
+            event,
+            'currentTarget',
+            {value: box.current,
+            configurable: true}
+        );
+        batch(() => {
+            setDragTouchActive(false);
+            setDragTouchEvent(null);
+            onDragStart(event)
+        });
+        draggingBox.current = true;
+    });
+
+    const handleDragEndMouse = useEventCallback(event => {
+        if (!draggingBox.current) return;
+        batch(() => onDragEnd(event));
+        draggingBox.current = false;
+    });
+
+    const handleDragEndTouch = useEventCallback(event => {
         // Restart touch state in case
         // there is not an an ongoing drag 
         // operation for this Source 
         // component.
         if (!draggingBox.current) {
-            setDragTouchActive(false);
-            setDragTouchEvent(null);
+            batch(() => {
+                setDragTouchActive(false);
+                setDragTouchEvent(null);
+            });
             return;
         }
         // Prevent default to prevent click
@@ -76,203 +121,257 @@ const DnDSource = ({
         // handling onDragEnd event for
         // this Source component.
         setTimeout(() => {
+            // Must re define currentTarget
+            // because drag end touch is 
+            // handled asynchronously.
+            Object.defineProperty(
+                event,
+                'currentTarget',
+                {value: box.current,
+                configurable: true}
+            );
             batch(() => onDragEnd(event));
             draggingBox.current = false;
         }, 0);
-    }
+    });
+
+    // Must add handler to node
+    // to allow drop and trigger
+    // drag over animation to occur
+    // in this component.
+
+    const handleAllowDragOverMouse = useEventCallback(event => {
+        event.preventDefault();
+    });
+
+    // Effect to attach event
+    // listeners to DOM node
+    // in ref for HTML 5 API
+
+    useEffect(() => {
+        if (!box.current) return;
+
+        const ref = box.current;
+
+        if (onDragStart) ref.addEventListener(
+            'dragstart',
+            handleDragStartMouse
+        );
+        if (onDragEnd) ref.addEventListener(
+            'dragend',
+            handleDragEndMouse
+        );
+        if (onDrop) ref.addEventListener(
+            'dragover',
+            handleAllowDragOverMouse
+        );
+        return () => {
+            if (onDragStart && ref) ref.removeEventListener(
+                'dragstart',
+                handleDragStartMouse,
+            );
+            if (onDragEnd && ref) ref.removeEventListener(
+                'dragend',
+                handleDragEndMouse,
+            );
+            if (onDrop && ref) ref.removeEventListener(
+                'dragover',
+                handleAllowDragOverMouse,
+            );
+        }
+    }, [
+        box,
+        onDragStart,
+        onDragEnd,
+        onDrop,
+        handleDragStartMouse,
+        handleDragEndMouse,
+        handleAllowDragOverMouse
+    ]);
+
+    // Effect to attach event
+    // listeners to DOM node
+    // in ref for Touch API
+
+    useEffect(() => {
+        if (!box.current || !allowTouch) return;
+
+        const ref = box.current;
+
+        if (onDragStart) ref.addEventListener(
+            'touchstart',
+            handlePreDragStartTouch
+        );
+        if (onDragEnd) ref.addEventListener(
+            'touchend',
+            handleDragEndTouch
+        );
+        return () => {
+            if (onDragStart && ref) ref.removeEventListener(
+                'touchstart',
+                handlePreDragStartTouch,
+            );
+            if (onDragEnd && ref) ref.removeEventListener(
+                'touchend',
+                handleDragEndTouch,
+            );
+        }
+    }, [
+        box,
+        onDragStart,
+        onDragEnd,
+        handlePreDragStartTouch,
+        handleDragEndTouch,
+    ]);
+
     // Effect to handle drag start
     // time threshold for touch
     // start event.
+
     useEffect(() => {
         if (!dragTouchActive) return;
-        const handleDragStart = () => {
-            batch(() => {
-                setDragTouchActive(false);
-                setDragTouchEvent(null);
-                onDragStart(dragTouchEvent)
-            });
-            draggingBox.current = true;
-        }
-        const timeout = setTimeout(() => {
-            handleDragStart();
-        }, dragTouchTimeThreshold);
+
+        // Store timeout in variable
+        // for cleanup.
+        const timeout = setTimeout(
+            handleDragStartTouch,
+            dragTouchTimeThreshold,
+            dragTouchEvent,
+        );
+
         return () => clearTimeout(timeout);
     }, [
         dragTouchActive,
         dragTouchEvent,
-        onDragStart,
         dragTouchTimeThreshold
     ]);
-    const isInsideBounds = useCallback((clientX, clientY) => {
-        const element = box.current;
-        // Necessary for when node is
-        // moved in DOM and ref is 
-        // still unattached to div 
-        // component.
-        if (!element) return false;
-        const rect = element.getBoundingClientRect();
-        const insideBounds = (
-            rect.left < clientX &&
-            rect.left + rect.width > clientX &&
-            rect.top < clientY &&
-            rect.top + rect.height > clientY
-        );
-        return insideBounds;
-    }, []);
-    // This callback makes document 
-    // attached event listeners to 
-    // provide a similar interface to 
-    // those listeners attached to React 
-    // Elements, i.e. provide same event 
-    // interface for mouse events and
-    // touch events. 
-    const mutateDOMEvent = useCallback(event => {
-        Object.defineProperty(
-            event, 
-            'stopPropagation',
-            {value: event.stopImmediatePropagation,
-            configurable: true},
-        )
-        Object.defineProperty(
-            event, 
-            'currentTarget',
-            {value: box.current, 
-            configurable: true},
-        );
-    }, []);
+
+    // Get event listener 
+    // registration from 
+    // context.
+
+    const context = useSketchContext();
+    const events = context.events;
+
+    const handleDragOver = useEventCallback(event => {
+        batch(() => onDragOver(event));
+    });
+
+    const handleDragEnter = useEventCallback(event => {
+        batch(() => onDragEnter(event));
+    });
+
+    const handleDragLeave = useEventCallback(event => {
+        batch(() => onDragLeave(event));
+    });
+
+    const handleDragIn = useEventCallback(event => {
+        batch(() => onDragIn(event));
+    });
+
+    const handleDragOut = useEventCallback(event => {
+        batch(() => onDragOut(event));
+    });
+
+    const handleDrop = useEventCallback(event => {
+        batch(() => onDrop(event));
+    });
+        
+    // Effect to register event
+    // handlers to document.
+
     useEffect(() => {
-        if (!isDragging || !allowTouch) return;
-        const handleTouchOver = event => {
-            const clientX = event.touches[0].clientX;
-            const clientY = event.touches[0].clientY;
-            const insidePrev = insideBox.current;
-            const insideNow = isInsideBounds(clientX, clientY);
-            if (!insideNow && insidePrev === insideNow) return;
-            // Mutate DOM Event before
-            // calling listeners to 
-            // provide interface.
-            mutateDOMEvent(event);
-            // To handle drag enter and 
-            // drag leave since inside bounds
-            // value changed from previous
-            // touchmove inside bounds.
-            if (insidePrev !== insideNow) {
-                if (insideNow) batch(() => onDragEnter(event));
-                if (!insideNow) batch(() => onDragLeave(event));
-                insideBox.current = insideNow;
-            }
-            // To handle drag over since
-            // touch move is currently 
-            // inside bounds.
-            if (insideNow) {
-                batch(() => onDragOver(event)); 
-            };
-        }
-        const handleTouchUp = event => {
-            const clientX = event.changedTouches[0].clientX;
-            const clientY = event.changedTouches[0].clientY;
-            const insideNow = isInsideBounds(clientX, clientY);
-            if (!insideNow) return 
-            // Mutate DOM Event before
-            // calling listener to 
-            // provide interface
-            mutateDOMEvent(event);
-            // To handle drop since
-            // touch end was done
-            // inside bounds.
-            batch(() => onDrop(event));
-        }
-        document.addEventListener(
-            'touchmove',
-            handleTouchOver,
-            {passive: false}
+        if (!isDragging) return;
+
+        if (onDragOver) events.addEventListener(
+            box.current,
+            'dragover',
+            handleDragOver,
         );
-        document.addEventListener(
-            'touchend',
-            handleTouchUp,
-            {passive: false} 
+        if (onDragEnter) events.addEventListener(
+            box.current,
+            'dragenter',
+            handleDragEnter,
+        );
+        if (onDragLeave) events.addEventListener(
+            box.current,
+            'dragleave',
+            handleDragLeave,
+        );
+        if (onDragIn) events.addEventListener(
+            box.current,
+            'dragin',
+            handleDragIn,
+        );
+        if (onDragOut) events.addEventListener(
+            box.current,
+            'dragout',
+            handleDragOut,
+        );
+        if (onDrop) events.addEventListener(
+            box.current,
+            'drop',
+            handleDrop,
         );
         return () => {
-            document.removeEventListener(
-                'touchmove',
-                handleTouchOver,
+            if (onDragOver) events.removeEventListener(
+                box.current,
+                'dragover',
+                handleDragOver,
             );
-            document.removeEventListener(
-                'touchend',
-                handleTouchUp,
+            if (onDragEnter) events.removeEventListener(
+                box.current,
+                'dragenter',
+                handleDragEnter,
+            );
+            if (onDragLeave) events.removeEventListener(
+                box.current,
+                'dragleave',
+                handleDragLeave,
+            );
+            if (onDragIn) events.removeEventListener(
+                box.current,
+                'dragin',
+                handleDragIn,
+            );
+            if (onDragOut) events.removeEventListener(
+                box.current,
+                'dragout',
+                handleDragOut,
+            );
+            if (onDrop) events.removeEventListener(
+                box.current,
+                'drop',
+                handleDrop,
             );
         }
     }, [
+        events,
+        box,
+        onDragOver,
         onDragEnter,
         onDragLeave,
-        onDragOver,
+        onDragIn,
+        onDragOut,
         onDrop,
-        isInsideBounds,
-        mutateDOMEvent,
+        handleDragOver,
+        handleDragEnter,
+        handleDragLeave,
+        handleDragIn,
+        handleDragOut,
+        handleDrop,
         isDragging,
-        allowTouch,
     ]);
-    // Cannot use as synthetic event
-    // since node can be moved in DOM 
-    // and drag end event is not triggered
-    // in such cases.
-    useEffect(() => {
-        if (!box.current) return;
-        const element = box.current;
-        const handleDragEndMouse = event => {
-            if (!draggingBox.current) return;
-            batch(() => onDragEnd(event));
-            draggingBox.current = false;
-        }
-        box.current.addEventListener(
-            'dragend',
-            handleDragEndMouse
-        );
-        return () => {
-            // && for move events when 
-            // box is reassigned to 
-            // div component
-            element && element.removeEventListener(
-                'dragend',
-                handleDragEndMouse,
-            );
-        }
-    }, [
-        onDragEnd,
-        mutateDOMEvent,
-    ]);
-    function getMouseEventHandlers() {
-        const passiveHandlers = {
-            onDragStart: handleDragStartMouse,
-        };
-        const activeHandlers = {
-            onDragEnter: handleDragEnterMouse,
-            onDragLeave: handleDragLeaveMouse,
-            onDragOver: handleDragOverMouse,
-            onDrop: handleDropMouse,
-            ...passiveHandlers,
-        }
-        return isDragging 
-        ? activeHandlers 
-        : passiveHandlers;
-    }
-    function getTouchSupportEventHandlers() {
-        const passiveHandlers = {
-            onTouchStart: handleDragStartTouch,
-            onTouchEnd: handleDragEndTouch,
-        }
-        return passiveHandlers;
-    }
-    return <div 
+
+    // Render with 'as' props 
+
+    const Component = as;
+    
+    return <Component 
         {...rest}
         ref = {box}
-        // Mouse events (HTML 5)
-        {...getMouseEventHandlers()}
-        // Touch events (Mobile)
-        {...getTouchSupportEventHandlers()}
-    >
-        {children}
-    </div>
-}
+    />
+
+});
 
 export default DnDSource;
