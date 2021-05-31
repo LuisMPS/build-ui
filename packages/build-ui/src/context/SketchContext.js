@@ -5,6 +5,10 @@ const SketchContext = createContext({
         refresh: () => {},
         abort: () => {},
     },
+    events: {
+        addEventListener: () => {},
+        removeEventListener: () => {}
+    },
 });
 
 export default SketchContext;
