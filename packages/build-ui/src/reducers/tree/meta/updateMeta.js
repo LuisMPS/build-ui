@@ -1,12 +1,12 @@
+import {deepMerge} from "../../../utils/object";
+
 function updateMeta(state, action) {
     const {
         id,
         meta = {}
     } = action.payload;
     // State mutations
-    Object.entries(meta).map(([prop, value]) => {
-        state.meta[id][prop] = value;
-    });
+    deepMerge(state.meta[id], meta);
 }
 
 const reducer = {
