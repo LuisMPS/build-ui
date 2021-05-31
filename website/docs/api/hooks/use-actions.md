@@ -401,7 +401,7 @@ Adds the given id to the given named list index.
 
 Removes the given id from the given named list index.
 
-(See [triggerIndexRemove()]((/docs/api/hooks/use-actions#actions)) for analogue example usage) 
+(See [triggerIndexRemove()](/docs/api/hooks/use-actions#actions) for analogue example usage) 
 
 - `triggerListIndexToggle: (data: Object) => void`
     - `data: (id: String, name: String) `
@@ -409,7 +409,7 @@ Removes the given id from the given named list index.
 Toggles the list index value relationship, i.e. if the list index contains
 the passed id, it removes it; if it is not, it adds it.
 
-(See [triggerIndexToggle()]((/docs/api/hooks/use-actions#actions)) for analogue example usage) 
+(See [triggerIndexToggle()](/docs/api/hooks/use-actions#actions) for analogue example usage) 
 
 - `triggerListIndexClear: (data: Object) => void`
     - `data: (name: String)`
@@ -417,7 +417,7 @@ the passed id, it removes it; if it is not, it adds it.
 Clears thelist  index relationship, so no id will be related to that named list index 
 after the call.
 
-(See [triggerIndexClear()]((/docs/api/hooks/use-actions#actions)) for analogue example usage) 
+(See [triggerIndexClear()](/docs/api/hooks/use-actions#actions) for analogue example usage) 
 
 
 

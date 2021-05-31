@@ -57,11 +57,11 @@ module.exports = {
             },
             {
               label: 'Tutorial',
-              to: '/docs/tutorial',
+              to: '/docs/tutorials/how-to-read',
             },
             {
               label: 'API',
-              to: '/docs/api',
+              to: '/docs/api/how-to-read',
             },
           ],
         },
