@@ -25,7 +25,9 @@ module.exports = {
     ],
     "rules": {
         "react/react-in-jsx-scope": "off",
-        "react/prop-types": 0,
+        "react/prop-types": "off",
+        "testing-library/render-result-naming-convention": "off",
+        "no-unused-vars": "off",
     },
     "overrides": [
         {
