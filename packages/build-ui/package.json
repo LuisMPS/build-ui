@@ -17,7 +17,8 @@
     "test": "npx jest --config=\"./jest.config.js\"",
     "test:watch": "npm run test -- --watch-all",
     "test:coverage": "npm run test -- --coverage=true",
-    "lint": "npx eslint \"./src\""
+    "lint": "npx eslint \"./src\"",
+    "compile:types": "npx tsc"
   },
   "keywords": [
     "react",
