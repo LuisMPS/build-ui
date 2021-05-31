@@ -1,4 +1,3 @@
-import {useState} from "react";
 import {shallowEqual, useSelector} from "react-redux";
 import {getTransfer} from "../../selectors";
 import {getTransferData, getTransferMeta} from "../../selectors/transfer";
@@ -10,19 +9,10 @@ import useDnDHelpers from "./useDnDHelpers";
 
 const useNodeDnD = ({
     initialTransferType,
-    initialOnDrop = () => {},
-    initialOnDropDone = () => {},
+    onDrop = () => {},
+    onDropDone = () => {},
     id,
 }) => {
-    // Must initialize state as callback
-    // since useState runs argument
-    // automatically if it is a callable
-    const [onDrop, setOnDrop] = useState(
-        () => initialOnDrop
-    );
-    const [onDropDone, setOnDropDone] = useState(
-        () => initialOnDropDone
-    );
     const nodeSelector = selectors => (
         selectors.selectById(id)
     );
@@ -31,7 +21,7 @@ const useNodeDnD = ({
     });
     const node = collect.node;
     const multiSelector = selectors => (
-        selectors.selectParentsById(id)
+        selectors.selectParents(id)
     );
     const multicollect = useMultiCollector({
         selector: multiSelector
@@ -201,13 +191,23 @@ const useNodeDnD = ({
     function handleDragEnd() {
         triggerDragEnd();
     }
+    function onDragEnter(handleDragEnter) {
+        const data = getTransferData(transfer);
+        const meta = getTransferMeta(transfer);
+        if (!data || meta.create) return handleDragEnter;
+        const bag = helpers.getDragAndDrop();
+        const moved = bag.transfer;
+        const isRecursive = (
+            nodeParents[moved.id] || 
+            node.id === moved.id
+        );
+        if (!isRecursive) return handleDragEnter;
+        return null;
+    }
     const dndBag = {
         transferType: transferType,
         onDrop: onDrop,
         onDropDone: onDropDone,
-        setTransferType: setTransferType,
-        setOnDrop: setOnDrop,
-        setOnDropDone: setOnDropDone,
     }
     const handlers = {
         handleDrop,
@@ -220,11 +220,15 @@ const useNodeDnD = ({
         triggerDragStart,
         triggerDragEnd,
     }
+    const wrappers = {
+        onDragEnter,
+    }
     const bag = {
         ...dndBag,
         ...handlers,
         ...triggers,
         ...helpers,
+        ...wrappers,
     }
     return bag;
 }
