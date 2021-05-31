@@ -1,16 +1,25 @@
 import React from 'react';
-import NodePanel from "./NodePanel"
+import useCollector from "../hooks/collectors/useCollector";
 
-/*
- * Facade component
- * for NodePanel. 
-*/
 const Panel = ({
-    view
+    view,
 }) => {
-    return <NodePanel 
-        view = {view}
+    const selector = selectors => (
+        selectors.selectByIndex('panel')
+    );
+    const collected = useCollector({
+        selector: selector,
+    });
+    const node = collected.node || {};
+    const type = node.type;
+    // Render as resolved type, with 
+    // props pass
+    const Resolved = view[type];
+    return Resolved 
+    ? <Resolved 
+        id = {node.id}
     />
+    : null;
 }
 
 export default Panel;
