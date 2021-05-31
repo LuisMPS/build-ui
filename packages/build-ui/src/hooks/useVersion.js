@@ -1,7 +1,8 @@
-import {useDispatch, useSelector} from "react-redux"
+import {shallowEqual, useDispatch, useSelector} from "react-redux"
 import {getTreeHistory, getTreeSlice} from "../selectors"
 import {redoHistory, undoHistory} from "../slices/tree";
 import {getCanRedo, getCanUndo} from "../history/selectors/history";
+import useSketchContext from "./useSketchContext";
 
 
 const useVersion = () => {
@@ -9,24 +10,30 @@ const useVersion = () => {
     const history = useSelector(
         getTreeHistory
     );
-    // console.log(slice);
+    const context = useSketchContext();
+    const batcher = context.batcher;
+    // console.log(history);
     function handleUndo() {
-        dispatch(undoHistory({}))
+        batcher.abort();
+        dispatch(undoHistory({}));
     }
     function handleRedo() {
+        batcher.abort();
         dispatch(redoHistory({}))
     }
     const redoSelector = store => getCanRedo(
         getTreeSlice(store)
     );
     const canRedo = useSelector(
-        redoSelector
+        redoSelector,
+        shallowEqual
     );
     const undoSelector = store => getCanUndo(
         getTreeSlice(store)
     );
     const canUndo = useSelector(
-        undoSelector
+        undoSelector,
+        shallowEqual
     );
     const historyBag = {
         history: history,
