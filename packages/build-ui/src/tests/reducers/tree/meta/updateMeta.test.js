@@ -21,19 +21,6 @@ describe('updateMeta', () => {
 
     const state = plainBranch(tree);
 
-    describe('should throw errors', () => {
-
-        test('should throw when id does not exist in tree', () => {
-            // Update fake meta
-            const action = updateMeta({
-                id: itemid(),
-                meta: {error: true}
-            });
-            expect(() => reducer(state, action)).toThrow();
-        });
-
-    });
-
     describe('should update node meta correctly', () => {
     
         test('should update node meta', () => {
