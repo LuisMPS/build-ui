@@ -1,6 +1,7 @@
 export class Timer {
     constructor(timer) {
         this.running = timer.running || false;
+        this.timeout = null;
         this.latest = timer.latest;
         this.checkpoint = timer.checkpoint;
         this.start = timer.start;
@@ -47,17 +48,24 @@ export class Timer {
         this.maxMillis = configuration.batchTimeLimit;
         this.begin();
         return new Promise((res, rej) => {
-            this.withHandlers({
-                resolve: res, 
-                reject: rej
-            });
             const finishLong = () => (
                 this.finishLong()
             )
-            setTimeout(
+            this.timeout = setTimeout(
                 finishLong, 
                 this.millis
             );
+            const reject = reason => {
+                rej(reason);
+                clearTimeout(this.timeout);
+            };
+            const resolve = value => {
+                res(value);
+            }
+            this.withHandlers({
+                resolve: resolve, 
+                reject: reject,
+            });
         });
     }
     finish() {
@@ -65,6 +73,7 @@ export class Timer {
         const total = this.getTotal();
         if (diff === 0 || total >= this.maxMillis) {
             this.running = false;
+            this.timeout = null;
             this.handlers.resolve();
             return true;
         }
@@ -77,7 +86,7 @@ export class Timer {
         const finishShort = () => (
             this.finishShort()
         );
-        setTimeout(
+        this.timeout = setTimeout(
             finishShort, 
             short
         );
@@ -89,20 +98,22 @@ export class Timer {
         const finishLong = () => (
             this.finishLong()
         );
-        setTimeout(
+        this.timeout = setTimeout(
             finishLong, 
             long
         );
     }
     forceFinish() {
         if (!this.running) return;
-        this.running = false;
         this.handlers.resolve();
+        this.running = false;
+        this.timeout = null;
     }
     abort(reason) {
         if (!this.running) return;
-        this.running = false;
         this.handlers.reject(reason);
+        this.running = false;
+        this.timeout = null;
     }
 }
 
