@@ -4,7 +4,8 @@
         "src/components/**/*",
         "src/hooks/**/*",
         "src/utils/**/*",
-        "src/tests/**/*"
+        "src/tests/**/*",
+        "src/index.js"
     ],
     "compilerOptions": {
       // Tells TypeScript to read JS files, as
