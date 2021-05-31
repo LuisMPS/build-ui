@@ -4,11 +4,11 @@ import {getTransfer} from "../selectors";
 import {getTransferData, getTransferType} from "../selectors/transfer";
 import DnDSource from "./DnDSource";
 
-const DnDListener = ({
+const DnDListener = React.forwardRef(({
     listenAny = false,
     listenTransferType,
     ...props
-}) => {
+}, ref) => {
     // Component to decouple
     // builder logic from drag
     // and drop source's logic
@@ -33,8 +33,9 @@ const DnDListener = ({
     );
     return <DnDSource 
         {...props}
+        ref = {ref}
         isDragging = {isDragging}
     />
-}
+});
 
 export default DnDListener;
