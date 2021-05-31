@@ -206,8 +206,8 @@ describe('object utils', () => {
         });
 
         it('should return object entries from entries', () => {
-            const obj = {c: 90, c: 90};
-            expect(entries(obj)).toEqual([['c', 90]]);
+            const obj = {c: 90, p: 90};
+            expect(entries(obj)).toEqual([['c', 90], ['p', 90]]);
         });
 
     });
