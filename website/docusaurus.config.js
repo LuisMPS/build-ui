@@ -2,8 +2,8 @@
 module.exports = {
   title: 'Build UI',
   tagline: 'Create your own page editors with React',
-  url: 'https://luismps.github.io.', 
-  baseUrl: '/',
+  url: 'https://luismps.github.io', 
+  baseUrl: '/build-ui/',
   onBrokenLinks: 'throw',
   onBrokenMarkdownLinks: 'warn',
   favicon: 'img/favicon.ico',
