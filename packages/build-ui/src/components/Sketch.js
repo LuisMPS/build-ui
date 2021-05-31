@@ -3,7 +3,7 @@ import {useDispatch} from "react-redux";
 import {configureHistory, configureBatchHistory} from "../slices/tree";
 import {useReplacer} from "../hooks/useComposed";
 import {useIsomorphicLayoutEffect} from "../hooks/useIsomorphicLayoutEffect";
-import Sketcher from "./Sketcher";
+import SketchProvider from "./SketchProvider";
 
 const Sketch = ({
     initialTree,
@@ -28,6 +28,8 @@ const Sketch = ({
     });
     const replacer = useReplacer();
     const replaceTree = replacer.handleReplace;
+    // Effect to replace initial
+    // tree if any was passed.
     useIsomorphicLayoutEffect(() => {
         if (prepared || !tree) return;
         replaceTree({
@@ -40,6 +42,8 @@ const Sketch = ({
         configuration,
         prepared
     ]);
+    // Effect to configure 
+    // history batching
     useIsomorphicLayoutEffect(() => {
         if (prepared) return;
         dispatch(configureHistory({
@@ -53,15 +57,17 @@ const Sketch = ({
         configuration,
         prepared
     ]);
+    // Effect to set prepare
+    // flag on initial render.
     useIsomorphicLayoutEffect(() => {
         if (prepared) return;
         setPrepared(true);
     }, [
         prepared
     ]);
-    return prepared && <Sketcher>
+    return prepared && <SketchProvider>
         {children}
-    </Sketcher>
+    </SketchProvider>
 }
 
 export default Sketch;
