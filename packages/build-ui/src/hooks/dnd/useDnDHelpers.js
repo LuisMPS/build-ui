@@ -1,6 +1,7 @@
 import {shallowEqual, useSelector} from "react-redux";
 import {getTransfer} from "../../selectors";
 import {getTransferData, getTransferMeta} from "../../selectors/transfer";
+import useEventHelpers from "../events/useEventHelpers";
 
 const useDnDHelpers = params => {
     const transferSelector = store => (
@@ -10,34 +11,12 @@ const useDnDHelpers = params => {
         transferSelector,
         shallowEqual,
     );
+    const events = useEventHelpers();
+    function getDnDEventClientCoords(event) {
+        return events.getEventClientCoords(event);
+    }
     function getDnDEventPosition(event) { 
-        const eventX = (
-            event.clientX ||
-            (event.changedTouches &&  
-            event.changedTouches[0].clientX) ||
-            (event.touces &&  
-            event.touches[0].clientX)
-        );
-        const eventY = (
-            event.clientY || 
-            (event.changedTouches &&  
-            event.changedTouches[0].clientY) ||
-            (event.touces &&
-            event.touches[0].clientY)
-        );
-        const target = event.currentTarget;
-        const {
-            top, height,
-            left, width,
-        } = target.getBoundingClientRect();
-        const centerX = left + width / 2;
-        const centerY = top + height / 2;
-        return {
-            top: centerY > eventY,
-            bottom: centerY <= eventY,
-            left: centerX > eventX,
-            right: centerX <= eventX,
-        }
+        return events.getEventPosition(event);
     }
     function getDragAndDrop() {
         const data = getTransferData(transfer);
@@ -90,6 +69,7 @@ const useDnDHelpers = params => {
     };
     const utils = {
         getDnDEventPosition,
+        getDnDEventClientCoords,
         getDragAndDrop,
     }
     const bag = {
