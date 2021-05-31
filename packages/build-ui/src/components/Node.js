@@ -3,22 +3,18 @@ import useCollector from "../hooks/collectors/useCollector";
 
 const Node = ({
     id,
-    root,
     view,
+    shallow,
 }) => {
-    // Root has priority over ID.
-    const selector = id && !root
-    ? selectors => (
+
+    const selector = selectors => (
         selectors.selectById(id)
-    )
-    : selectors => (
-        selectors.selectRoot()
-    )
+    );
     const collected = useCollector({
         selector: selector
     });
 
-    const node = collected.node || {};
+    const node = collected.node;
     const {
         type,
         props,
@@ -40,7 +36,7 @@ const Node = ({
         {...props} 
         id = {node.id}
     >
-        {childIds.length > 0
+        {!shallow && childIds.length > 0
         ? childIds.map(
         childId => (
         <Node 
