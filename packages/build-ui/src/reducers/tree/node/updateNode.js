@@ -1,3 +1,4 @@
+import {deepMerge} from "../../../utils/object";
 
 // Action will have payload containing
 // reference id to node to update, and
@@ -5,9 +6,7 @@
 function updateNode(state, action) {
     const {id, props = {}} = action.payload;
     // State mutations
-    Object.entries(props).map(([prop, value]) => {
-        state.byIds[id].props[prop] = value;
-    })
+    deepMerge(state.byIds[id].props, props);
 }
 
 const reducer = {
