@@ -2,7 +2,7 @@ import {createSlice} from "@reduxjs/toolkit"
 import batched from "../enhancers/batched";
 import unbatched from "../enhancers/unbatched";
 import signer from "../enhancers/signer";
-import proxy from "../enhancers/proxy";
+import unrecorded from '../enhancers/unrecorded';
 import {commitHistory, redoHistory, undoHistory, restartHistory, configureBatchHistory, configureHistory} from "../reducers";
 import {isFunction} from "../utils/function";
 
@@ -66,7 +66,7 @@ const createVersionedSlice = ({
         const unrecorder_name = `${reducer_name}/unrecorded`;
         completeReducers[batched_name] = withEnhancers(reducer, batched);
         completeReducers[unbatched_name] = withEnhancers(reducer, unbatched);
-        completeReducers[unrecorder_name] = withEnhancers(reducer, proxy, signer);
+        completeReducers[unrecorder_name] = withEnhancers(reducer, unrecorded);
         // Raw reducer, as it would have 
         // been returned by normal
         // createSlice function. Behaviour
