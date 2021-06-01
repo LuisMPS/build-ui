@@ -16,13 +16,20 @@ You can install via npm with the command:
 npm install --save build-ui
 ```
 
+# Demo
+
+A cool demo is now live at https://luismps.github.io/build-ui/demo/. You can also play and experiment with the demo in your local environment.
+
+```shell
+> git clone https://github.com/LuisMPS/build-ui/
+> cd build-ui/examples/demo
+> npm install
+> npm run dev
+```
+
 # Documentation
 
 Visit our documentation at [https://luismps.github.io/build-ui/](https://luismps.github.io/build-ui/) to learn more about Build UI 😃.
-
-# Demo
-
-Coming soon! A cool demo is in our to-do list! Meanwhile, you can follow along our tutorial to see Build-UI in action.
 
 # Tutorial
 
