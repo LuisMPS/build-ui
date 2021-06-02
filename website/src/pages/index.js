@@ -21,7 +21,7 @@ function HomepageHeader() {
           </Link>
           <Link
             className={"button button--secondary button--lg " + styles.button_banner}
-            to= "/demo">
+            to= "https://luismps.github.io/build-ui/demo">
             Watch Demo
           </Link>
         </div>
