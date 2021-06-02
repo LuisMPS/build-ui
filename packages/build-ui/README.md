@@ -4,11 +4,11 @@ Build-UI is a simple library thought for React developers packed with features t
 
 Please be aware that Build-UI is currently an early-stage project in development phase. 
 
-# Overview
+# Overview 🔎
 
 With Build-UI, you can create anything from a very simple to a fully-featured website builder. Build-UI lets you create your website builder on top of your own or third-party React Components. With Build-UI, you only need a lightweight extra layer of code to handle website-building logic, which is made as simple and as transparent as possible.
 
-# Installation
+# Installation 💻
 
 You can install via npm with the command:
 
@@ -16,15 +16,22 @@ You can install via npm with the command:
 npm install --save build-ui
 ```
 
-# Documentation
+# Demo 🕹️
+
+A cool demo is now live at https://luismps.github.io/build-ui/demo/. You can also play and experiment with the demo in your local environment.
+
+```shell
+> git clone https://github.com/LuisMPS/build-ui/
+> cd build-ui/examples/demo
+> npm install
+> npm run dev
+```
+
+# Documentation 📖
 
 Visit our documentation at [https://luismps.github.io/build-ui/](https://luismps.github.io/build-ui/) to learn more about Build UI 😃.
 
-# Demo
-
-Coming soon! A cool demo is in our to-do list! Meanwhile, you can follow along our tutorial to see Build-UI in action.
-
-# Tutorial
+# Tutorial ✏️
 
 Go check out our tutorial at: https://luismps.github.io/build-ui/docs/tutorials/how-to-read
 
