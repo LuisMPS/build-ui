@@ -57,11 +57,11 @@ metadata. If metadata property is not supplied, it will default to an object wit
 property with a true value.
 
 - `triggerDragStart: (obj: Object) => void`
-    - `obj: (data: Node, meta: Object)`
+    - `obj: (data: Tree, meta: Object)`
 
 
 :::note
-Click [Here](/docs/api/utility/structures/#definitions) for more information on Node.
+Click [Here](/docs/api/utility/structures/#definitions) for more information on Tree.
 :::
 
 - `handleDragEnd: (event: Event) => void`

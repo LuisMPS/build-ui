@@ -12,12 +12,12 @@ A React Component to provide Builder Context. It is a wrapper for your site buil
 
 #### Props ⚙️ {#props}
 
-- `initialTree?: Node | Object` 
+- `initialTree?: Tree | Object` 
 
 The initial tree representation that will be used as the builder state.
 
 :::caution
-Make sure you pass a valid node  or valid tree representation object. There will be no sanity check, so passing an invalid representation of a tree will lead to unexpected behavior.
+Make sure you pass a valid tree or valid tree representation object. There will be no sanity check, so passing an invalid tree representation will lead to unexpected behavior.
 :::
 
 - `historyLimit?: int`

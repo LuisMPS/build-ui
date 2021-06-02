@@ -75,7 +75,7 @@ be serializable if you lifted data, such as a node props, with non-serializable
 values like functions.
 :::
 
-- `loadTree: (tree: Node | Object) => void`
+- `loadTree: (tree: Tree | Object) => void`
 
 Loads builder state, must likely previously returned from the [json()](/docs/api/hooks/use-builder/#return-value) function. It should be a valid object representation of a builder state. Providing a non-valid builder representation will have unexpected behavior.
 

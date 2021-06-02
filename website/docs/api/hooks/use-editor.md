@@ -74,8 +74,7 @@ has properties:
 
 The **event** property refers to the event that triggered the handleDrop function.
 
-The **transfer** property refers to the node that is being dragged. Its properties are 
-id, type, props, childIds, parentId. See [Node](/docs/api/utility/structures/#definitions) for more information
+The **transfer** property refers to the root node of the tree that is being dragged. Its properties are id, type, props, childIds, parentId. See [Node, Tree](/docs/api/utility/structures/#definitions) for more information
 
 The **meta** property refers to the object passed to the [triggerDragStart](/docs/api/hooks/use-editor/#return-value) function (if any), with an additional *create* Boolean property that determines whether the drop created a new node or the node was only moved.
 
@@ -95,8 +94,7 @@ be created. The bag object has properties:
 
 The **event** property refers to the event that triggered the handleDrop function.
 
-The **transfer** property refers to the node that is being dragged. Its properties are 
-id, type, props, childIds, parentId. See [Node](/docs/api/utility/structures/#definitions) for more information
+The **transfer** property refers to the root node of the tree that is being dragged. Its properties are id, type, props, childIds, parentId. See [Node, Tree](/docs/api/utility/structures/#definitions) for more information
 
 The **meta** property refers to the object passed to the [triggerDragStart](/docs/api/hooks/use-editor/#return-value) function (if any), with an additional *create* Boolean property that determines whether the drop created a new node or the node was only moved.
 
