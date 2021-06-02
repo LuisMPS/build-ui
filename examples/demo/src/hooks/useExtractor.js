@@ -42,7 +42,6 @@ const useExtractor = (
                 const selectorText = cssRule.selectorText;
                 // Remove pseudo-selectors.
                 const selector = selectorText.replace(/:(\S)+/, '');
-                console.log(selectorText, selector);
                 const match = cssNodes.some(node => {
                     try {
                         return node.matches(selector);
