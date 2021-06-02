@@ -1,6 +1,8 @@
+import {useRef} from 'react';
 import {DnDBuilderHOC} from 'build-ui';
 import useDemoEditor from '../../../../hooks/useDemoEditor';
 import usePositioner from '../../../../hooks/usePositioner';
+import useExtractor from '../../../../hooks/useExtractor';
 import useStyle from './style/CanvasView';
 import Canvas from './Canvas';
 
@@ -21,6 +23,8 @@ const CanvasView = ({
         hovering: editor.hovering,
         fixed: true,
     });
+    const ref = useRef();
+    useExtractor(id, ref);
     return <BuilderCanvas
         // DnD Props
         onDrop = {editor.handleDrop}
@@ -29,6 +33,7 @@ const CanvasView = ({
         // Other Props
         onClick = {editor.handleSelect}
         className = {classes.view}
+        ref = {ref}
         // Canvas Props
         {...props}
     />
