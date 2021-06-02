@@ -15,13 +15,13 @@ function HomepageHeader() {
         <p className="hero__subtitle">{siteConfig.tagline}</p>
         <div className={styles.buttons}>
           <Link
-            className="button button--secondary button--lg"
+            className={"button button--secondary button--lg " + styles.button_banner}
             to="/docs/intro">
             Get Started!
           </Link>
           <Link
-            className="button button--secondary button--lg"
-            to={siteConfig.url + "/build-ui/demo"}>
+            className={"button button--secondary button--lg " + styles.button_banner}
+            to= "/demo">
             Watch Demo
           </Link>
         </div>
