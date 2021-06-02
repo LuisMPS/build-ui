@@ -18,16 +18,11 @@ const historyReducers = {
     configureBatchHistory: configureBatchHistory, 
 }
 
-const createVersionedSlice = ({
-    name,
-    initialState,
-    reducers,
-    extraReducers,
-}) => {
+export const createVersionedState = state => {
 
     const history = {
         version: 0,
-        present: initialState,
+        present: state,
         timeline: [],
     };
     const timer = {
@@ -47,6 +42,19 @@ const createVersionedSlice = ({
         batch: batch,
         configuration: configuration,
     };
+
+    return versionedState;
+
+}
+
+const createVersionedSlice = ({
+    name,
+    initialState,
+    reducers,
+    extraReducers,
+}) => {
+
+    const versionedState = createVersionedState(initialState);
 
     const completeReducers = Object.entries(reducers)
     .reduce((completeReducers, [reducer_name, reducer]) => {

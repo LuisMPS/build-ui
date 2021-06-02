@@ -1,7 +1,7 @@
 import {configureStore} from '@reduxjs/toolkit';
 import React, {useState} from 'react';
 import {Provider} from 'react-redux';
-import rootReducer from '../slices';
+import rootReducer, {preloadedSlices} from '../slices';
 import Sketch from './Sketch';
 
 const Builder = ({
@@ -30,11 +30,18 @@ const Builder = ({
         // Trade-offs include time-traveling
         // debug problems.
         middleware: [],
+        // Configure initial store state
+        // to received initialTree prop.
+        // (This allows stuff like SSG
+        // because no useEffect is 
+        // required).
+        preloadedState: preloadedSlices({
+            tree: initialTree,
+        }),
     });
     const [store] = useState(initialStore);
     return <Provider store = {store}>
         <Sketch 
-            initialTree = {initialTree}
             historyLimit = {historyLimit}
             historyBatchTime = {historyBatchTime}
             historyBatchTimeLimit = {historyBatchTimeLimit}
