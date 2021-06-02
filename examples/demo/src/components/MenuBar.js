@@ -1,19 +1,32 @@
 import {useState, useEffect, useRef} from "react";
 import {useBuilder} from "build-ui";
 import {unstable_batchedUpdates as batch} from "react-dom";
-import useStyle from "./style/MenuBar";
+import Button from "@material-ui/core/Button";
 import clsx from "clsx";
-import { Button } from "@material-ui/core";
+import useExporter from "../hooks/useExporter";
+import useStyle from "./style/MenuBar";
 
 const MenuBar = ({
     className,
     ...props
 }) => {
     const builder = useBuilder();
-    const [save, setSave] = useState(false);
-    const [link, setLink] = useState(null);
+    const exporter = useExporter();
+
+    const saver = useRef();
+    const exporterHTML = useRef();
+    const exporterCSS = useRef();
+
+    const [saving, setSaving] = useState(false);
+    const [exporting, setExporting] = useState(false);
+
+    const [saveLink, setSaveLink] = useState(null);
+    const [htmlLink, setHTMLLink] = useState(null);
+    const [cssLink, setCSSLink] = useState(null);
+
     const [file, setFile] = useState(null);
-    // console.log(builder.history)
+
+    // console.log(builder.history);
     const {
         handleRedo,
         handleUndo,
@@ -22,14 +35,16 @@ const MenuBar = ({
         canRedo,
         canUndo,
     } = builder;
+
     const handleSave = () => {
-        console.log(json());
+        // console.log(json());
         const content = JSON.stringify(json());
         const file = new Blob([content], {type: 'application/json'});
         const link = URL.createObjectURL(file);
-        setLink(link);
-        setSave(true);
+        setSaveLink(link);
+        setSaving(true);
     }
+
     const handleLoad = event => {
         const file = event.target.files[0];
         // Must manage with effect
@@ -37,13 +52,20 @@ const MenuBar = ({
         // will be done async.
         setFile(file);        
     }
+
+    const handleExport = () => {
+        exporter.handleExport();
+        setExporting(true);
+    }
+
     useEffect(() => {
-        if (!save) return;
-        download.current.click();
-        URL.revokeObjectURL(link);
+        if (!saving) return;
+        saver.current.click();
+        URL.revokeObjectURL(saveLink);
         setLink(null);
-        setSave(false);
-    }, [save, link]);
+        setSaving(false);
+    }, [saving, saveLink]);
+
     useEffect(() => {
         if (!file) return;
         const content = file.text();
@@ -53,7 +75,51 @@ const MenuBar = ({
             setFile(null);
         })).catch();
     });
-    const download = useRef();
+
+    const css = exporter.css;
+    const html = exporter.html;
+    useEffect(() => {
+        if (!exporting) return;
+        if (css) {
+            const file = new Blob([css], {type: 'text/css'});
+            const link = URL.createObjectURL(file);
+            setCSSLink(link);
+            setExporting(false);
+        }
+        if (html) {
+            const formatHTML = html => (
+                '<html>' +
+                '<head></head>' +
+                '<body>' + html + '</body>' +
+                '</html>'
+            );
+            const formattedHTML = formatHTML(html);
+            const file = new Blob([formattedHTML], {type: 'text/html'});
+            const link = URL.createObjectURL(file);
+            setHTMLLink(link);
+            setExporting(false);
+        }
+    }, [
+        html, 
+        css, 
+        exporting,
+    ]);
+
+    useEffect(() => {
+        if (!htmlLink) return;
+        exporterHTML.current.click();
+        URL.revokeObjectURL(htmlLink);
+        setHTMLLink(null);
+    }, [htmlLink]);
+
+    useEffect(() => {
+        if (!cssLink) return;
+        exporterCSS.current.click();
+        URL.revokeObjectURL(cssLink);
+        setCSSLink(null);
+    }, [cssLink]);
+
+
     const classes = useStyle();
     const classAll = clsx(
         className,
@@ -90,14 +156,14 @@ const MenuBar = ({
             onClick = {handleSave}
             className = {clsx(classes.action, classes.button)}
         >
-            <a
-                hidden = {true}
-                download = {true}
-                href = {link}
-                ref = {download}
-            />
             Save 
         </Button>
+        <a
+            hidden = {true}
+            download = {true}
+            href = {saveLink}
+            ref = {saver}
+        />
 
         <Button 
             type = 'file'
@@ -114,6 +180,27 @@ const MenuBar = ({
                 onChange = {handleLoad}
             />
         </Button>
+
+        <Button 
+            color = 'primary'
+            variant = 'outlined'
+            onClick = {handleExport}
+            className = {clsx(classes.action, classes.button)}
+        >
+            Export
+        </Button>
+        <a
+            hidden = {true}
+            download = {true}
+            href = {htmlLink}
+            ref = {exporterHTML}
+        />
+        <a
+            hidden = {true}
+            download = {true}
+            href = {cssLink}
+            ref = {exporterCSS}
+        />
 
     </div>
 }
