@@ -1,51 +1,26 @@
 import React, {useState} from "react";
 import {useDispatch} from "react-redux";
 import {configureHistory, configureBatchHistory} from "../slices/tree";
-import {useReplacer} from "../hooks/useComposed";
 import {useIsomorphicLayoutEffect} from "../hooks/useIsomorphicLayoutEffect";
 import SketchProvider from "./SketchProvider";
 
 const Sketch = ({
-    initialTree,
     historyLimit = 99999,
     historyBatchTime = 3000,
     historyBatchTimeLimit = 6000,
     children,
 }) => {
-    // Make sure to only render
-    // initial tree once on
-    // mount to avoid rerendering 
-    // whole tree when parent or
-    // this sketch component is 
-    // rerendered. 
     const dispatch = useDispatch();
-    const [prepared, setPrepared] = useState(false);
-    const [tree] = useState(initialTree);
+    const [configured, setConfigured] = useState(false);
     const [configuration] = useState({
         historyLimit: historyLimit,
         historyBatchTime: historyBatchTime,
         historyBatchTimeLimit: historyBatchTimeLimit,
     });
-    const replacer = useReplacer();
-    const replaceTree = replacer.handleReplace;
-    // Effect to replace initial
-    // tree if any was passed.
-    useIsomorphicLayoutEffect(() => {
-        if (prepared || !tree) return;
-        replaceTree({
-            tree: tree,
-        });
-        setPrepared(true);
-    }, [
-        replaceTree,
-        tree, 
-        configuration,
-        prepared
-    ]);
     // Effect to configure 
     // history batching
     useIsomorphicLayoutEffect(() => {
-        if (prepared) return;
+        if (configured) return;
         dispatch(configureHistory({
             configuration: configuration,
         }));
@@ -55,17 +30,17 @@ const Sketch = ({
     }, [
         dispatch,
         configuration,
-        prepared
+        configured,
     ]);
-    // Effect to set prepare
+    // Effect to set configured
     // flag on initial render.
     useIsomorphicLayoutEffect(() => {
-        if (prepared) return;
-        setPrepared(true);
+        if (configured) return;
+        setConfigured(true);
     }, [
-        prepared
+        configured
     ]);
-    return prepared && <SketchProvider>
+    return <SketchProvider>
         {children}
     </SketchProvider>
 }
