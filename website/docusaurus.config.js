@@ -4,7 +4,7 @@ module.exports = {
   tagline: 'Create your own page editors with React',
   url: 'https://luismps.github.io', 
   baseUrl: '/build-ui/',
-  onBrokenLinks: 'throw',
+  onBrokenLinks: 'warn',
   onBrokenMarkdownLinks: 'warn',
   favicon: 'img/favicon.ico',
   organizationName: 'LuisMPS', // Usually your GitHub org/user name.
