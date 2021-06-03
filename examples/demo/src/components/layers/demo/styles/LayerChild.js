@@ -1,4 +1,4 @@
-import {makeStyles} from "@material-ui/core";
+import {makeStyles} from "@material-ui/core/styles";
 import combineStyles from "../../../builder/styles"
 
 const childStyles = ({
