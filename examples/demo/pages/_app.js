@@ -1,4 +1,5 @@
-import {useEffect} from 'react';
+import React, {useEffect} from 'react';
+import Head from 'next/head';
 import {ThemeProvider, createMuiTheme} from '@material-ui/core/styles';
 import '../styles/globals.css'
 
@@ -31,9 +32,17 @@ function MyApp({ Component, pageProps }) {
     },
   });
 
-  return <ThemeProvider theme = {theme}>
-    <Component {...pageProps} />
-  </ThemeProvider>
+  return <React.Fragment>
+      <Head>
+        <meta 
+          name="viewport" 
+          content="viewport-fit=cover" 
+        />
+      </Head>
+      <ThemeProvider theme = {theme}>
+        <Component {...pageProps} />
+      </ThemeProvider>
+  </React.Fragment>
 }
 
 export default MyApp

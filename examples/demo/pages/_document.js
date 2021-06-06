@@ -7,6 +7,23 @@ export default class MyDocument extends Document {
     return (
       <Html lang="en">
         <Head>
+        <meta charset="UTF-8" />
+        <meta 
+          name="description" 
+          content="Create your own website editors with Build UI"
+        />
+        <meta 
+          name="keywords" 
+          content="React, Website Editors, Build UI"
+        />
+        <meta 
+          name="author" 
+          content="LuisMPS"
+        />
+        <link 
+          rel="icon" 
+          href="/favicon.ico"
+        />
         <link  
           rel="preconnect" 
           href="https://fonts.gstatic.com"
