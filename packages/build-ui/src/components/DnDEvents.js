@@ -199,27 +199,32 @@ const DnDEvents = ({
         ref.current = elements;
     }
 
-    
+    // eslint-disable-next-line
     function handleDrop(event) {
         getBubblingEventHandler('drop')(event);
     }
 
+    // eslint-disable-next-line
     function handleDragOver(event) {
         getBubblingEventHandler('dragover')(event);
     }
 
+    // eslint-disable-next-line
     function handleDragEnter(event) {
         getEnteringEventHandler('dragenter')(event)(position);
     }
 
+    // eslint-disable-next-line
     function handleDragLeave(event) {
         getLeavingEventHandler('dragleave')(event)(position);
     }
 
+    // eslint-disable-next-line
     function handleDragIn(event) {
         getInEventHandler('dragin')(event)(inside);
     }
 
+    // eslint-disable-next-line
     function handleDragOut(event) {
         getOutEventHandler('dragout')(event)(inside);
     }
