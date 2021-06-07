@@ -4,7 +4,7 @@ import useSketchContext from "../hooks/useSketchContext";
 import useEventCallback from "../hooks/events/useEventCallback";
 import {batch} from "react-redux";
 
-const DnDSource = React.forwardRef(({
+const DnDSource = React.forwardRef(function DnDSource({
     onDrop,
     onDragEnd,
     onDragOver,
@@ -19,7 +19,7 @@ const DnDSource = React.forwardRef(({
     isDragging = false, 
     as = 'div',
     ...rest
-}, ref) => {
+}, ref) {
 
     // Use share ref to both forward
     // ref to parent component and
@@ -42,7 +42,7 @@ const DnDSource = React.forwardRef(({
             forwarding in underlying
             node to attach listeners.
         `);
-    }, [])
+    }, [box])
 
     // Events that go attached to 
     // this DOM node and trigger
@@ -218,6 +218,7 @@ const DnDSource = React.forwardRef(({
         }
     }, [
         box,
+        allowTouch,
         onDragStart,
         onDragEnd,
         handlePreDragStartTouch,
@@ -243,7 +244,8 @@ const DnDSource = React.forwardRef(({
     }, [
         dragTouchActive,
         dragTouchEvent,
-        dragTouchTimeThreshold
+        dragTouchTimeThreshold,
+        handleDragStartTouch,
     ]);
 
     // Get event listener 
@@ -283,64 +285,66 @@ const DnDSource = React.forwardRef(({
     useEffect(() => {
         if (!isDragging) return;
 
+        const ref = box.current;
+
         if (onDragOver) events.addEventListener(
-            box.current,
+            ref,
             'dragover',
             handleDragOver,
         );
         if (onDragEnter) events.addEventListener(
-            box.current,
+            ref,
             'dragenter',
             handleDragEnter,
         );
         if (onDragLeave) events.addEventListener(
-            box.current,
+            ref,
             'dragleave',
             handleDragLeave,
         );
         if (onDragIn) events.addEventListener(
-            box.current,
+            ref,
             'dragin',
             handleDragIn,
         );
         if (onDragOut) events.addEventListener(
-            box.current,
+            ref,
             'dragout',
             handleDragOut,
         );
         if (onDrop) events.addEventListener(
-            box.current,
+            ref,
             'drop',
             handleDrop,
         );
         return () => {
-            if (onDragOver) events.removeEventListener(
-                box.current,
+            if (onDragOver && ref) events.removeEventListener(
+                ref,
                 'dragover',
                 handleDragOver,
             );
-            if (onDragEnter) events.removeEventListener(
-                box.current,
+            if (onDragEnter && ref) events.removeEventListener(
+                ref,
                 'dragenter',
                 handleDragEnter,
             );
-            if (onDragLeave) events.removeEventListener(
-                box.current,
+            if (onDragLeave && ref) events.removeEventListener(
+                ref,
                 'dragleave',
                 handleDragLeave,
             );
-            if (onDragIn) events.removeEventListener(
-                box.current,
+            if (onDragIn && ref) events.removeEventListener(
+                ref,
                 'dragin',
                 handleDragIn,
             );
-            if (onDragOut) events.removeEventListener(
-                box.current,
+            if (onDragOut && ref) events.removeEventListener(
+                ref,
                 'dragout',
                 handleDragOut,
             );
-            if (onDrop) events.removeEventListener(
-                box.current,
+            if (onDrop && ref) events.removeEventListener(
+                ref,
                 'drop',
                 handleDrop,
             );
