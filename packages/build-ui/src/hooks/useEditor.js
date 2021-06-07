@@ -36,14 +36,17 @@ const useEditor = ({
         const value = target.value;
         const checked = target.checked;
         switch (type) {
-            case 'checkbox':
+            case 'checkbox': {
                 return checked;
+            }
             case 'number':
-            case 'range': 
+            case 'range': {
                 const number = parseNumber(value); 
                 return isNumber(number) ? number : value;
-            default:
+            }
+            default: {
                 return value;
+            }
         }
     }
     function handleUpdate(event, parser) {
