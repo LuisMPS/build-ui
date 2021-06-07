@@ -1,9 +1,9 @@
 import React from 'react';
 import DnDListener from "./DnDListener";
 
-const DnDBuilder = React.forwardRef(({
+const DnDBuilder = React.forwardRef(function DnDBuilder({
     ...props
-}, ref) => {
+}, ref) {
     // Listen to builder
     // drag and drop operations
     // only
