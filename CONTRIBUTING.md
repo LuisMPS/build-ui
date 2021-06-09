@@ -27,7 +27,7 @@ We suggest to work on a single thing at a time to increase your chances of getti
 ```sh
 git clone https://github.com/<your username>/build-ui.git
 cd build-ui
-git remote add origin https://github.com/<your username>/build-ui.git
+git remote add origin https://github.com/LuisMPS/build-ui.git
 ```
 
 3. Synchronize your local `main` branch with the remote one.
