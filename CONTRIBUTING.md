@@ -6,7 +6,7 @@ As a starting open source repository, we would greatly appreciate and benefit fr
 
 ## Ways to Contribute
 
-You can contribute to Build UI is a a lot of ways. Contributing with code is one of them:
+You can contribute to Build UI in a a lot of ways. Contributing with code is one of them:
 
 - **Send your PRs**: you can send pull requests for code contributions, either to fix issues or to send your ideas. If you are planning to work on a PR, please notify [@LuisMPS](https://github.com/LuisMPS) to avoid duplicate efforts.
 
@@ -27,7 +27,7 @@ We suggest to work on a single thing at a time to increase your chances of getti
 ```sh
 git clone https://github.com/<your username>/build-ui.git
 cd build-ui
-git remote add origin https://github.com/LuisMPS/build-ui.git
+git remote add origin https://github.com/<your username>/build-ui.git
 ```
 
 3. Synchronize your local `main` branch with the remote one.
