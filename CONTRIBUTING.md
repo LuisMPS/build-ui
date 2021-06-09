@@ -1,6 +1,4 @@
-======================
-Contributing to Build UI
-======================
+# Contributing to Build UI
 
 First of all, thanks for looking into this section. We're glad you consider investing your time and effort into this project. 
 
