@@ -79,7 +79,7 @@ npm run lint
 ```sh
 git add my-contribution.js
 git commit -m "Added my contribution"
-git push -u origin
+git push -u my-origin
 ```
 
 2. Go to [the repository](https://github.com/LuisMPS/build-ui) and [make a Pull Request](https://docs.github.com/en/free-pro-team@latest/github/collaborating-with-issues-and-pull-requests/creating-a-pull-request).
