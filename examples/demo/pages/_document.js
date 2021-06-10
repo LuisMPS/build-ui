@@ -7,7 +7,7 @@ export default class MyDocument extends Document {
     return (
       <Html lang="en">
         <Head>
-        <meta charset="UTF-8" />
+        <meta charSet="UTF-8" />
         <meta 
           name="description" 
           content="Create your own website editors with Build UI"
