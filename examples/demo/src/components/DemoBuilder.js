@@ -4,11 +4,11 @@ import Demo from './builder/templates/demo';
 const DemoBuilder = ({
     children,
 }) => {
-    return <Builder 
+    return <Builder
         initialTree = {Demo}
-        historyLimit = {999999}
-        historyBatchTime = {3000}
-        historyBatchTimeLimit = {6000}
+        initialHistoryLimit = {9999}
+        initialBatchTime = {3000}
+        initialBatchTimeLimit = {6000}
     >
         {children}
     </Builder>
