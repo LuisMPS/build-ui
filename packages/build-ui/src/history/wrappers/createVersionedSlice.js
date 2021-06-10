@@ -18,16 +18,21 @@ const historyReducers = {
     configureBatchHistory: configureBatchHistory, 
 }
 
-export const createVersionedState = state => {
+export const createVersionedState = ({
+    initialState,
+    initialBatchTime = 3000,
+    initialBatchTimeLimit = 9000,
+    initialHistoryLimit = 9999999,
+}) => {
 
     const history = {
         version: 0,
-        present: state,
+        present: initialState,
         timeline: [],
     };
     const timer = {
-        batchTime: 3000,
-        batchTimeLimit: 9000,
+        batchTime: initialBatchTime,
+        batchTimeLimit: initialBatchTimeLimit,
     }
     const batch = {
         patches: [],
@@ -35,7 +40,7 @@ export const createVersionedState = state => {
         past: null,
     }
     const configuration = {
-        historyLimit: 9999999,
+        historyLimit: initialHistoryLimit,
     }
     const versionedState = {
         history: history,
