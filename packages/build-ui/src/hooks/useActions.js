@@ -2,11 +2,11 @@ import {useDispatch} from "react-redux";
 import {addIndexBatched, addIndexUnbatched, addIndexUnrecorded, addListIndexBatched, addListIndexUnbatched, addListIndexUnrecorded, clearIndexBatched, clearIndexUnbatched, clearIndexUnrecorded, clearListIndexBatched, clearListIndexUnbatched, clearListIndexUnrecorded, commitHistory, intershiftNodeBatched, intershiftNodeUnbatched, intershiftNodeUnrecorded, moveNodeBatched, moveNodeUnbatched, moveNodeUnrecorded, removeIndexBatched, removeIndexUnbatched, removeIndexUnrecorded, removeListIndexBatched, removeListIndexUnbatched, removeListIndexUnrecorded, rewriteNodeBatched, rewriteNodeUnbatched, rewriteNodeUnrecorded, toggleIndexBatched, toggleIndexUnbatched, toggleIndexUnrecorded, toggleListIndexBatched, toggleListIndexUnbatched, toggleListIndexUnrecorded, updateMetaBatched, updateMetaUnbatched, updateMetaUnrecorded, updateNodeBatched, updateNodeUnbatched, updateNodeUnrecorded} from "../slices/tree";
 import {useCreator, useDeleter} from "./useComposed";
 import {setIn} from "../utils/object";
-import useSketchContext from "./useSketchContext";
+import useBuilderContext from "./useBuilderContext";
 
 const useActions = () => {
     const dispatch = useDispatch();
-    const context = useSketchContext();
+    const context = useBuilderContext();
     const batcher = context.batcher;
     const creator = useCreator();
     const deleter = useDeleter();

@@ -1,5 +1,5 @@
 import {useReplacer} from "./useComposed";
-import useSketchContext from "./useSketchContext";
+import useBuilderContext from "./useBuilderContext";
 import useVersion from "./useVersion";
 import {getTreeFromHistory} from "../selectors/tree";
 
@@ -9,7 +9,7 @@ const useBuilder = () => {
     const tree = getTreeFromHistory(
         version.history
     );
-    const context = useSketchContext();
+    const context = useBuilderContext();
     const batcher = context.batcher;
     function json() {
         return tree;
