@@ -100,7 +100,7 @@ describe('<Builder />', () => {
 
     test('should initialize passed history configuration', () => {
         const handleHistoryConfigure = jest.fn();
-        render(<Builder historyLimit = {69}>
+        render(<Builder initialHistoryLimit = {69}>
             <BuilderTestComponent onHistoryConfigure = {handleHistoryConfigure} />
         </Builder>);
         expect(handleHistoryConfigure).toHaveBeenLastCalledWith(
@@ -113,8 +113,8 @@ describe('<Builder />', () => {
     test('should initialize passed batch configuration', () => {
         const handleBatchConfigure = jest.fn();
         render(<Builder 
-            historyBatchTime = {420}
-            historyBatchTimeLimit = {420*3}
+            initialBatchTime = {420}
+            initialBatchTimeLimit = {420*3}
         >
             <BuilderTestComponent onBatchConfigure = {handleBatchConfigure} />
         </Builder>);

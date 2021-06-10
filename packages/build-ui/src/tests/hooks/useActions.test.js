@@ -719,8 +719,8 @@ describe('useActions', () => {
         const wrapper = ({children, onSlice}) => (
             <Builder 
                 initialTree = {initialTree}
-                historyBatchTime = {1000}
-                historyBatchTimeLimit = {1000} 
+                initialBatchTime = {1000}
+                initialBatchTimeLimit = {1000} 
             >
                 <TreeTestComponent onSlice = {onSlice} />
                 {children}
