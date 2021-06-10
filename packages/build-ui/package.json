@@ -1,6 +1,6 @@
 {
   "name": "build-ui",
-  "version": "0.1.0-alpha.7",
+  "version": "0.1.0-alpha.8",
   "description": "Code your own site builders with React",
   "repository": {
     "type": "git",
@@ -14,11 +14,11 @@
   ],
   "scripts": {
     "build": "npx rollup --config rollup.config.js",
+    "build:types": "npx tsc",
     "test": "npx jest --config=\"./jest.config.js\"",
     "test:watch": "npm run test -- --watch-all",
     "test:coverage": "npm run test -- --coverage=true",
-    "lint": "npx eslint \"./src\"",
-    "compile:types": "npx tsc"
+    "lint": "npx eslint \"./src\""
   },
   "keywords": [
     "react",
