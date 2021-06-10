@@ -20,15 +20,15 @@ The initial tree representation that will be used as the builder state.
 Make sure you pass a valid tree or valid tree representation object. There will be no sanity check, so passing an invalid tree representation will lead to unexpected behavior.
 :::
 
-- `historyLimit?: int`
+- `initialHistoryLimit?: int`
 
 The maximum amount of undoes/redoes that can be done. You should pass a very large number if you want the history have no limit.
 
 :::info
-Default value for historyBatchTime is **9999999**
+Default value for historyBatchTime is **9999999**. You can use this prop if you want history state to not grow too large.
 :::
 
-- `historyBatchTime?: int`
+- `initialBatchTime?: int`
 
 The amount of time in milliseconds that the batcher timer should wait for the next time batched action before committing to history. (See [this](/docs/api/hooks/use-actions/#return-value) for an explanation).
 
@@ -36,12 +36,24 @@ The amount of time in milliseconds that the batcher timer should wait for the ne
 Default value for historyBatchTime is **3000**
 :::
 
-- `historyBatchTimeLimit?: int`
+- `initialBatchTimeLimit?: int`
 
 The maximum amount of time in milliseconds that a batch can last for time batched actions (See [this](/docs/api/hooks/use-actions/#return-value) for an explanation). Ideally, it should be a multiple of historyBatchTime. It should also be greater than historyBatchTime.
 
 :::info
 Default value for historyBatchTimeLimit is **6000**
+:::
+
+- `initialHistory?: Object` 
+
+The initial tree history representation that will be used as the builder state. Use this prop if you want to keep redo/undo state.
+
+:::note
+If you pass initialHistory to the `Builder` Component, all other props to initialize state will be ignored and overriden by initialHistory.
+:::
+
+:::caution
+Make sure you pass a valid tree history representation object. There will be no sanity check, so passing an invalid state will lead to unexpected behavior.
 :::
 
 - `children?: React.Children`
@@ -56,7 +68,7 @@ import shopTemplate from './templates/shop'
 const MyBuilder = () => {
     return <Builder 
         initialTree = {shopTemplate}
-        historyLimit = {25}
+        initialHistoryLimit = {25}
         initialBatchTime = {4000}
         initialBatchTimeLimit = {12000}
     >
