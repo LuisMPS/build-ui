@@ -1,6 +1,6 @@
 import {createContext} from "react";
 
-const SketchContext = createContext({
+const BuilderContext = createContext({
     batcher: {
         refresh: () => {},
         abort: () => {},
@@ -11,4 +11,4 @@ const SketchContext = createContext({
     },
 });
 
-export default SketchContext;
+export default BuilderContext;
