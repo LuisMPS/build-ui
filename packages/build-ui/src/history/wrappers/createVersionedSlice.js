@@ -54,12 +54,20 @@ export const createVersionedState = ({
 
 const createVersionedSlice = ({
     name,
-    initialState,
     reducers,
     extraReducers,
+    initialState,
+    initialBatchTime,
+    initialBatchTimeLimit,
+    initialHistoryLimit,
 }) => {
 
-    const versionedState = createVersionedState(initialState);
+    const versionedState = createVersionedState({
+        initialState,
+        initialBatchTime,
+        initialBatchTimeLimit,
+        initialHistoryLimit, 
+    });
 
     const completeReducers = Object.entries(reducers)
     .reduce((completeReducers, [reducer_name, reducer]) => {
