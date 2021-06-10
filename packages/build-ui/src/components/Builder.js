@@ -1,16 +1,28 @@
 import {configureStore} from '@reduxjs/toolkit';
 import React, {useState} from 'react';
 import {Provider} from 'react-redux';
-import rootReducer, {preloadedSlices} from '../slices';
-import Sketch from './Sketch';
+import rootReducer from '../slices';
+import preloadedTree from '../slices/preloads/tree';
+import BuilderProvider from './BuilderProvider';
 
 const Builder = ({
     initialTree,
-    historyLimit,
-    historyBatchTime,
-    historyBatchTimeLimit,
+    initialHistoryLimit,
+    initialBatchTime,
+    initialBatchTimeLimit,
+    initialHistory,
     children,
 }) => {
+    const initialTreeState = preloadedTree({
+        initialTree,
+        initialHistoryLimit,
+        initialBatchTime,
+        initialBatchTimeLimit,
+    });
+    const treePreload = (
+        initialHistory || 
+        initialTreeState
+    );
     // Builder component will most likely
     // be a sub-application, for which
     // having multiple stores is justified.
@@ -35,19 +47,15 @@ const Builder = ({
         // (This allows stuff like SSG
         // because no useEffect is 
         // required).
-        preloadedState: preloadedSlices({
-            tree: initialTree,
+        preloadedState: ({
+            tree: treePreload,
         }),
     });
     const [store] = useState(initialStore);
     return <Provider store = {store}>
-        <Sketch 
-            historyLimit = {historyLimit}
-            historyBatchTime = {historyBatchTime}
-            historyBatchTimeLimit = {historyBatchTimeLimit}
-        >
+        <BuilderProvider>
             {children}
-        </Sketch>
+        </BuilderProvider>
     </Provider>
 }
 
