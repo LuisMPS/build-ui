@@ -1,14 +1,9 @@
 import {createSlice} from "@reduxjs/toolkit";
+import preloadedTransfer from "./preloads/transfer";
 import {
     startTransfer as startTransferReducer, 
     endTransfer as endTransferReducer
 } from '../reducers/transfer';
-
-const initialState = {
-    data: null,
-    meta: null,
-    type: null,
-}
 
 const reducers = {
     startTransfer: startTransferReducer,
@@ -17,7 +12,7 @@ const reducers = {
 
 const transfer = createSlice({
     name: 'transfer',
-    initialState: initialState,
+    initialState: preloadedTransfer(),
     reducers: reducers,
 });
 

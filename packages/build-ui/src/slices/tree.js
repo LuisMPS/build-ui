@@ -23,9 +23,6 @@ import {
     clearListIndex as clearListIndexReducer,
 } from '../reducers/tree';
 
-const initialTree = branch();
-const initialState = normalizeBranch(initialTree);
-
 const reducers = {
     createNode: createNodeReducer,
     deleteNode: deleteNodeReducer,
@@ -51,7 +48,6 @@ const reducers = {
 
 const tree = createVersionedSlice({
     name: 'tree',
-    initialState: initialState,
     reducers: reducers,
 });
 
