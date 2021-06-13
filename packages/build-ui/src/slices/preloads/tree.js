@@ -1,4 +1,4 @@
-import {createVersionedState} from "../../history/wrappers/createVersionedSlice";
+import {createVersionedState, loadVersionedSliceHistory} from "../../history/wrappers/createVersionedSlice";
 import {branch, plainBranch} from "../../utils/tree";
 
 // Initial preloaded state
@@ -36,4 +36,15 @@ const preloadedTree = ({
     })
 }
 
+const preloadedTreeHistory = ({
+    initialTreeSlice,
+    initialHistory,
+}) => {
+    return loadVersionedSliceHistory({
+        initialSlice: initialTreeSlice,
+        initialHistory: initialHistory
+    });
+}
+
 export default preloadedTree;
+export {preloadedTreeHistory};
