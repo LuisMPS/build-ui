@@ -20,6 +20,22 @@ The initial tree representation that will be used as the builder state.
 Make sure you pass a valid tree or valid tree representation object. There will be no sanity check, so passing an invalid tree representation will lead to unexpected behavior.
 :::
 
+- `initialTimeline?: [Object]` 
+
+The initial timeline that will be used. A *timeline* contains redo/undo state. 
+
+:::caution
+Make sure you pass a valid timeline array. There will be no sanity check, so passing an invalid timeline will lead to unexpected behavior.
+:::
+
+- `initialVersion?: int` 
+
+The initial version, which represents the position of initialTree in initialTime.
+
+:::caution
+Make sure you supply the correct version, i.e. redoes/undoes can be applied to tree given initialTimeline elements.
+:::
+
 - `initialHistoryLimit?: int`
 
 The maximum amount of undoes/redoes that can be done. You should pass a very large number if you want the history have no limit.
@@ -42,18 +58,6 @@ The maximum amount of time in milliseconds that a batch can last for time batche
 
 :::info
 Default value for historyBatchTimeLimit is **6000**
-:::
-
-- `initialHistory?: Object` 
-
-The initial tree history representation that will be used as the builder state. Use this prop if you want to keep redo/undo state.
-
-:::note
-If you pass initialHistory to the `Builder` Component, all other props to initialize state will be ignored and overriden by initialHistory.
-:::
-
-:::caution
-Make sure you pass a valid tree history representation object. There will be no sanity check, so passing an invalid state will lead to unexpected behavior.
 :::
 
 - `children?: React.Children`
