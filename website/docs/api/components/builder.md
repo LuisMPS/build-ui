@@ -16,7 +16,7 @@ A React Component to provide Builder Context. It is a wrapper for your site buil
 
 The initial tree representation that will be used as the builder state.
 
-:::caution
+:::note
 Make sure you pass a valid tree or valid tree representation object. There will be no sanity check, so passing an invalid tree representation will lead to unexpected behavior.
 :::
 
@@ -24,7 +24,7 @@ Make sure you pass a valid tree or valid tree representation object. There will 
 
 The initial timeline that will be used. A *timeline* contains redo/undo state. 
 
-:::caution
+:::note
 Make sure you pass a valid timeline array. There will be no sanity check, so passing an invalid timeline will lead to unexpected behavior.
 :::
 
@@ -32,7 +32,7 @@ Make sure you pass a valid timeline array. There will be no sanity check, so pas
 
 The initial version, which represents the position of initialTree in initialTime.
 
-:::caution
+:::note
 Make sure you supply the correct version, i.e. redoes/undoes can be applied to tree given initialTimeline elements.
 :::
 
