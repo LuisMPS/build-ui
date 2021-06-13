@@ -20,15 +20,18 @@ const historyReducers = {
 
 export const createVersionedState = ({
     initialState,
+    initialTimeline = [],
+    initialVersion = 0,
     initialBatchTime = 3000,
     initialBatchTimeLimit = 9000,
     initialHistoryLimit = 9999999,
 }) => {
-
+    // Build slice with passed
+    // and fallback data.
     const history = {
-        version: 0,
+        version: initialVersion,
         present: initialState,
-        timeline: [],
+        timeline: initialTimeline,
     };
     const timer = {
         batchTime: initialBatchTime,
@@ -52,25 +55,13 @@ export const createVersionedState = ({
 
 }
 
-export const loadVersionedSliceHistory = ({
-    initialSlice,
-    initialHistory,
-}) => {
-
-    return initialHistory 
-    ? Object.assign(
-        initialSlice,
-        {history: initialHistory}
-    )
-    : initialSlice
-    
-}
-
 const createVersionedSlice = ({
     name,
     reducers,
     extraReducers,
     initialState,
+    initialTimeline,
+    initialVersion,
     initialBatchTime,
     initialBatchTimeLimit,
     initialHistoryLimit,
@@ -81,6 +72,8 @@ const createVersionedSlice = ({
         initialBatchTime,
         initialBatchTimeLimit,
         initialHistoryLimit, 
+        initialTimeline,
+        initialVersion,
     });
 
     const completeReducers = Object.entries(reducers)
