@@ -52,6 +52,20 @@ export const createVersionedState = ({
 
 }
 
+export const loadVersionedSliceHistory = ({
+    initialSlice,
+    initialHistory,
+}) => {
+
+    return initialHistory 
+    ? Object.assign(
+        initialSlice,
+        {history: initialHistory}
+    )
+    : initialSlice
+    
+}
+
 const createVersionedSlice = ({
     name,
     reducers,
