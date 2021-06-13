@@ -1,9 +1,9 @@
 import {configureStore} from '@reduxjs/toolkit';
 import React, {useState} from 'react';
 import {Provider} from 'react-redux';
-import rootReducer from '../slices';
-import preloadedTree from '../slices/preloads/tree';
 import BuilderProvider from './BuilderProvider';
+import rootReducer from '../slices';
+import preloadedTree, {preloadedTreeHistory} from '../slices/preloads/tree';
 
 const Builder = ({
     initialTree,
@@ -13,16 +13,16 @@ const Builder = ({
     initialHistory,
     children,
 }) => {
-    const initialTreeState = preloadedTree({
+    const initialTreeSlice = preloadedTree({
         initialTree,
         initialHistoryLimit,
         initialBatchTime,
         initialBatchTimeLimit,
     });
-    const treePreload = (
-        initialHistory || 
-        initialTreeState
-    );
+    const treePreload = preloadedTreeHistory({
+        initialTreeSlice,
+        initialHistory,
+    });
     // Builder component will most likely
     // be a sub-application, for which
     // having multiple stores is justified.
