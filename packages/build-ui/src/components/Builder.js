@@ -3,25 +3,24 @@ import React, {useState} from 'react';
 import {Provider} from 'react-redux';
 import BuilderProvider from './BuilderProvider';
 import rootReducer from '../slices';
-import preloadedTree, {preloadedTreeHistory} from '../slices/preloads/tree';
+import preloadedTree from '../slices/preloads/tree';
 
 const Builder = ({
     initialTree,
+    initialTimeline,
+    initialVersion,
     initialHistoryLimit,
     initialBatchTime,
     initialBatchTimeLimit,
-    initialHistory,
     children,
 }) => {
     const initialTreeSlice = preloadedTree({
         initialTree,
+        initialTimeline,
+        initialVersion,
         initialHistoryLimit,
         initialBatchTime,
         initialBatchTimeLimit,
-    });
-    const treePreload = preloadedTreeHistory({
-        initialTreeSlice,
-        initialHistory,
     });
     // Builder component will most likely
     // be a sub-application, for which
@@ -48,7 +47,7 @@ const Builder = ({
         // because no useEffect is 
         // required).
         preloadedState: ({
-            tree: treePreload,
+            tree: initialTreeSlice,
         }),
     });
     const [store] = useState(initialStore);
