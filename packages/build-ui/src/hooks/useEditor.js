@@ -1,3 +1,4 @@
+import {useEffect} from "react";
 import useNodeDnD from "./dnd/useNodeDnD";
 import useCollector from "./collectors/useCollector";
 import useActions from "./useActions";
@@ -10,6 +11,23 @@ const useEditor = ({
     onDrop,
     onDropDone,
 }) => {
+
+    // Warn client if a falsy
+    // id was received, as this
+    // will cause unpredictable 
+    // behavior.
+
+    useEffect(() => {
+        if (id) return;
+        console.warn(`
+            Did not received valid 
+            id in editor hook. 
+            Please provide a valid
+            id to have predictable 
+            behavior.
+        `);
+    }, [id]);
+
     const nodeSelector = selectors => (
         selectors.selectById(id)
     );

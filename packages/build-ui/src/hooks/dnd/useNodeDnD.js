@@ -1,3 +1,4 @@
+import {useEffect} from "react";
 import {shallowEqual, useSelector} from "react-redux";
 import {getTransfer} from "../../selectors";
 import {getTransferData, getTransferMeta} from "../../selectors/transfer";
@@ -8,11 +9,28 @@ import useDnD from "./useDnD";
 import useDnDHelpers from "./useDnDHelpers";
 
 const useNodeDnD = ({
+    id,
     initialTransferType,
     onDrop = () => {},
     onDropDone = () => {},
-    id,
 }) => {
+
+    // Warn client if a falsy
+    // id was received, as this
+    // will cause unpredictable 
+    // behavior.
+
+    useEffect(() => {
+        if (id) return;
+        console.warn(`
+            Did not received valid 
+            id in DnD hook. 
+            Please provide a valid
+            id to have predictable 
+            behavior.
+        `);
+    }, [id]);
+
     const nodeSelector = selectors => (
         selectors.selectById(id)
     );
