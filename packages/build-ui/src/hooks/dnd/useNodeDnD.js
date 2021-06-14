@@ -11,8 +11,6 @@ import useDnDHelpers from "./useDnDHelpers";
 const useNodeDnD = ({
     id,
     initialTransferType,
-    onDrop = () => {},
-    onDropDone = () => {},
 }) => {
 
     // Warn client if a falsy
@@ -59,9 +57,6 @@ const useNodeDnD = ({
     const transferType = (
         dnd.transferType
     );
-    const setTransferType = (
-        dnd.setTransferType
-    );
     const helpers = useDnDHelpers({
         transferType: transferType,
     });
@@ -78,18 +73,12 @@ const useNodeDnD = ({
     function triggerDragEnd() {
         dnd.triggerDragEnd();
     }
-    function dropUtils(drop) {
-        // Below functions 
-        // will be passed to dropper 
-        // function when called on 
-        // handleDrop.
-        const cancel = () => {
-            drop.cancelled = true;
-            drop.explicitCancel = true;
-        };
-        return {
-            cancel: cancel,
-        }
+    function handleDragStart(event) {
+        triggerDragStart({});
+        event.stopPropagation();
+    }
+    function handleDragEnd() {
+        triggerDragEnd();
     }
     function handleDrop(event, position = null) {
         const data = getTransferData(transfer);
@@ -105,90 +94,21 @@ const useNodeDnD = ({
     }
     function handleDropCreate(event, position) {
         const data = getTransferData(transfer);
-        const drop = {
-            cancelled: false,
-            explicitCancel: false,
-        };
-        const dropBag = {
-            event: event,
-            ...helpers.getDragAndDrop(),
-        }
-        const onDropBag = {
-            cancelled: drop.cancelled,
-            ...dropUtils(drop),
-            ...dropBag,
-        }
-        onDrop(onDropBag);
-        // Stop the rest of event 
-        // handlers only if drop was 
-        // succesful or explicitly. 
-        // cancelled. (To delegate
-        // drop handling instead of 
-        // short-circuiting event, 
-        // such as when moving node
-        // a little amount away from
-        // current position).
-        const stopEvent = (
-            !drop.cancelled || 
-            drop.explicitCancel
-        );
-        if (stopEvent) {
-            event.stopPropagation();
-        }
-        if (drop.cancelled) {
-            return;
-        }
         actions.timeBatched.triggerCreate({
             targetId: id,
             node: data,
             position: position,
         });
-        onDropDone(dropBag);
+        event.stopPropagation()
     }
     function handleDropMove(event, position) {
-        const moved = getTransferData(transfer);
-        const isRecursive = (
-            nodeParents[moved.id] || 
-            node.id === moved.id
-        );
-        const drop = {
-            cancelled: isRecursive,
-            explicitCancel: false,
-        };
-        const dropBag = {
-            event: event,
-            ...helpers.getDragAndDrop(),
-        }
-        const onDropBag = {
-            cancelled: drop.cancelled,
-            ...dropUtils(drop),
-            ...dropBag,
-        }
-        // Short-circuit if drop is 
-        // recursive before the rest
-        // of event handling logic.
-        if (drop.cancelled) {
-            return;
-        }
-        onDrop(onDropBag);
-        // Stop event bubbling
-        // as explained above.
-        const stopEvent = (
-            !drop.cancelled || 
-            drop.explicitCancel
-        );
-        if (stopEvent) {
-            event.stopPropagation();
-        }
-        if (drop.cancelled) {
-            return;
-        }
+        const data = getTransferData(transfer);
         actions.timeBatched.triggerMove({
-            id: moved.id,
+            id: data.id,
             targetId: id,
             position: position,
         });
-        onDropDone(dropBag);
+        event.stopPropagation()
     }
     function handleChildYDrop(event, position) {
         const {top} = helpers.getDnDEventPosition(event);
@@ -202,35 +122,38 @@ const useNodeDnD = ({
         const dropPosition = position + offset;
         handleDrop(event, dropPosition);
     }
-    function handleDragStart(event) {
-        event.stopPropagation();
-        triggerDragStart({});
-    }
-    function handleDragEnd() {
-        triggerDragEnd();
-    }
-    function onDragEnter(handleDragEnter) {
-        const data = getTransferData(transfer);
-        const meta = getTransferMeta(transfer);
-        if (!data || meta.create) return handleDragEnter;
+    function toDnDHandler(handler) {
+        // Must wrap handlers with
+        // this function to avoid
+        // handling unwanted events,
+        // such as "recursive" dnd
+        // events, like dropping
+        // a component into itself.
         const bag = helpers.getDragAndDrop();
-        const moved = bag.transfer;
+        if (!bag) {
+            return handler;
+        }
+        const transferID = bag.transfer.id;
         const isRecursive = (
-            nodeParents[moved.id] || 
-            node.id === moved.id
+            nodeParents[transferID] ||
+            transferID === id
         );
-        if (!isRecursive) return handleDragEnter;
-        return null;
+        if (!isRecursive) {
+            return handler;
+        }
+        // Ignore handler if
+        // transfer node is 
+        // invalid.
+        return undefined;
     }
     const dndBag = {
-        transferType: transferType,
-        onDrop: onDrop,
-        onDropDone: onDropDone,
+        transferType: dnd.transferType,
+        setTransferType: dnd.setTransferType,
     }
     const handlers = {
-        handleDrop,
-        handleChildXDrop,
-        handleChildYDrop,
+        handleDrop: toDnDHandler(handleDrop),
+        handleChildXDrop: toDnDHandler(handleChildXDrop),
+        handleChildYDrop: toDnDHandler(handleChildYDrop),
         handleDragStart,
         handleDragEnd,
     }
@@ -239,7 +162,7 @@ const useNodeDnD = ({
         triggerDragEnd,
     }
     const wrappers = {
-        onDragEnter,
+        toDnDHandler,
     }
     const bag = {
         ...dndBag,
