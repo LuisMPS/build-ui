@@ -68,10 +68,10 @@ const useDemoLayers = ({
         indexes: collected.indexes,
     }
     const handlers = {
-        handleDelegatedDrop,
-        handleDelegatedDragOver,
-        handleDragEnter,
-        handleDragLeave,
+        handleDelegatedDrop: layers.toDnDHandler(handleDelegatedDrop),
+        handleDelegatedDragOver: layers.toDnDHandler(handleDelegatedDragOver),
+        handleDragEnter: layers.toDnDHandler(handleDragEnter),
+        handleDragLeave: layers.toDnDHandler(handleDragLeave),
     };
     const bag = {
         ...demoBag,
