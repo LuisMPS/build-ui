@@ -27,20 +27,8 @@ const ComponentView = ({
     id,
     ...props
 }) => {
-    const onDrop = ({
-        transfer, 
-        cancel
-    }) => {
-        const type = transfer.type;
-        // Do not allow buttons 
-        // inside this Component.
-        if (type === 'Button') {
-            cancel();
-        }
-    }
     const editor = useEditor({
         id: id,
-        onDrop: onDrop
     });
     return <DnDBuilder
         onDragStart = {editor.handleDragStart}
@@ -59,44 +47,6 @@ const ComponentView = ({
 - `id: String` 
 
 The ID of the Component to be edited.
-
-- `onDrop: (bag: Object) => void`
-
-A function to be called whenever something is dropped into this
-Component and handled by the **handleDrop** function. The bag object
-has properties:
-
-```js
-    const {event, transfer, meta, cancel} = bag;
-    const {id, type, props, ...rest} = transfer;
-    const {create, ...other} = meta;
-```
-
-The **event** property refers to the event that triggered the handleDrop function.
-
-The **transfer** property refers to the root node of the tree that is being dragged. Its properties are id, type, props, childIds, parentId. See [Node, Tree](/docs/api/utility/structures/#definitions) for more information
-
-The **meta** property refers to the object passed to the [triggerDragStart](/docs/api/hooks/use-editor/#return-value) function (if any), with an additional *create* Boolean property that determines whether the drop created a new node or the node was only moved.
-
-The **cancel** property is a function to cancel the drop. See [example usage](/docs/api/hooks/use-editor/#example-usage) for useEditor().
-
-- `onDropDone: (bag: Object) => void`
-
-A function to be called whenever an event was succesfully 
-handled by the handleDrop function and a new Component will 
-be created. The bag object has properties:
-
-```js
-    const {event, transfer, meta} = bag;
-    const {id, type, props, ...rest} = transfer;
-    const {create, ...other} = meta;
-```
-
-The **event** property refers to the event that triggered the handleDrop function.
-
-The **transfer** property refers to the root node of the tree that is being dragged. Its properties are id, type, props, childIds, parentId. See [Node, Tree](/docs/api/utility/structures/#definitions) for more information
-
-The **meta** property refers to the object passed to the [triggerDragStart](/docs/api/hooks/use-editor/#return-value) function (if any), with an additional *create* Boolean property that determines whether the drop created a new node or the node was only moved.
 
 
 #### Return Value 📤 {#return-value}
@@ -240,14 +190,16 @@ const ComponentView = ({
 }
 ```
 
-- `onDragEnter: (handler: Function) => void`
+- `toDnDHandler: (handler: Function) => handler: Function | undefined`
 
-A wrapper function to your dragEnter event handler. You will most likely want to wrap your handleDragEnter functions with this function. If you dont wrap your handlers with this function, your handler will be called even when dragging the same component or parent 
-components inside the component's bounds (aka most likely not your expected behavior).
+A wrapper function drag and drop event handlers. You **must** use this function to wrap your handlers and provide them to `onDrop`, `onDragOver`, `onDragEnter`, `onDragLeave`, `onDragIn`, and `onDragOut` events, in case you are using a [DnDListener](/docs/api/components/dnd-listener). If you dont wrap your handlers with this function, your handler will be called even when dragging the same component or parent components inside the component's bounds (most likely not your expected behavior). 
+
+:::note
+Use only for the events listed above. It is not necessary to wrap [handleDrop](/docs/api/hooks/use-editor/#return-value) provided by useEditor, since it is already wrapped. **toDnDHandler** is an [idempotent](https://en.wikipedia.org/wiki/Idempotence) operation, so wraps will have no effect beyond the first wrap.
+:::
 
 - Example Usage:
-
-```jsx
+```js
 const ComponentView = ({
     id,
     ...props
@@ -255,24 +207,26 @@ const ComponentView = ({
     const editor = useEditor({
         id: id
     });
-    const handleDragEnter = event => (
-        editor.handleUpdate(event, parser)
-    );
+    const handleDrop = event => {
+        // Custom drop logic, like
+        // cancelling if dropping a
+        // component of certain type.
+        editor.handleDrop(event);
+    }
+    const handleOutline = event => {
+        // Add border on drag enter
+    }
+    const handleRemoveOutline = event => {
+        // Remove border on drag enter
+    }
     return <DnDBuilder
-        onDrop = {editor.handleDrop}
-        onDragEnter = {editor.onDragEnter(handleDragEnter)}
+        onDragStart = {editor.handleDragStart}
+        onDragEnd = {editor.handleDragEnd}
+        onDragEnter = {editor.toDnDHandler(handleOutline)}
+        onDragLeave = {editor.toDnDHandler(handleRemoveOutline)}
+        onDrop = {editor.toDnDHandler(handleDrop)}
     >
         <Component {...props} />
-    </DnDBuilder>
+    </DnDBuilder>  
 }
 ```
-
-- `onDrop: (bag: Object) => void`
-
-A mirror of the onDrop function that was passed as an argument to the 
-useEditor hook.
-
-- `onDropDone: (bag: Object) => void`
-
-A mirror of the onDropDone function that was passed as an argument to the
-useEditor hook.
