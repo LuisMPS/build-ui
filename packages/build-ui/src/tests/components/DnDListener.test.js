@@ -1,28 +1,11 @@
-import React, {useEffect} from 'react';
-import {useDispatch} from 'react-redux';
+import React from 'react';
 
 import {render, screen, fireEvent} from '@testing-library/react';
 import '@testing-library/jest-dom';
 
 import Builder from '../../components/Builder';
 import DnDListener from '../../components/DnDListener';
-import {startTransfer} from '../../slices/transfer';
 
-const DnDListenerTestComponent = ({
-    transfering = false,
-    transferType,
-}) => {
-    const dispatch = useDispatch();
-    useEffect(() => {
-        if (!transfering) return;
-        dispatch(startTransfer({
-            data: true,
-            meta: true,
-            type: transferType,
-        }));
-    });
-    return null;
-}
 
 describe('<DnDListener />', () => {
 

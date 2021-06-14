@@ -51,7 +51,7 @@ describe('<Panel />', () => {
             console.error.mockRestore()
         });
     
-        test('should throw error when view prop has no properties', () => {
+        test('should throw error when view prop is not an object', () => {
             expect(() => {
                 render(<Builder initialTree = {initialTree}>
                     <Panel />
