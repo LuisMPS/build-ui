@@ -1,7 +1,6 @@
-import {useActions, useCollector, useEditor} from "build-ui"
+import {useActions, useCollector, useDnDHelpers, useEditor} from "build-ui"
 import {useEffect, useRef, useState} from "react";
 import {convertToPx, extractNumber, extractUnits} from "../utils/units";
-import usePositioner from "./usePositioner";
 
 const useDemoEditor = params => {
     const id = params.id;
@@ -13,8 +12,29 @@ const useDemoEditor = params => {
     const collected = useCollector({
         selector: nodeSelector
     });
-    const positioner = usePositioner();
     const builder = useRef();
+    function getDnDPosition(event) {
+        const target = event.currentTarget;
+        const {
+            top,
+            left    
+        } = target.getBoundingClientRect();
+        // Necessary for elements with 
+        // scrollable overflow. Will be
+        // passive on non-scrollable
+        // elements since values will be 0.
+        const scrollTop = target.scrollTop;
+        const scrollLeft = target.scrollLeft;
+        const {getDnDEventClientCoords} = helpers;
+        const [clientX, clientY] = getDnDEventClientCoords(event);
+        const position = {
+            top: clientY + scrollTop - top,
+            left: clientX  + scrollLeft - left,
+        };
+        // console.log(clientY, top, scrollTop)
+        // console.log(clientY, top, position.top)
+        return position;
+    }
     function handlePositionedDragStart(event) {
         const {top, left} = editor.props.style;
         const unitsTop = extractUnits(top) || 'px';
@@ -23,7 +43,6 @@ const useDemoEditor = params => {
             unitsLeft: unitsLeft,
             unitsTop: unitsTop,
         }
-        const {getDnDPosition} = positioner;
         const position = getDnDPosition(event);
         const meta = {
             position: position,
@@ -71,6 +90,80 @@ const useDemoEditor = params => {
             // etc...
             widthProp: editor.props.style.width,
             heightProp: editor.props.style.height,
+        });
+    }
+    const helpers = useDnDHelpers();
+    function handlePositionedDrop(event, position) {
+        editor.handleDrop(event, position);
+        const bag = helpers.getDragAndDrop()
+        const draggedId = bag.transfer.id;
+        const dropPosition = getDnDPosition(event);
+        // Supply a fallback drag 
+        // position, to drop at
+        // top left corner for 
+        // unpositioned drags,
+        // such as when dragging 
+        // initially from tools.
+        const defaultDragPosition = {
+            left: 0, 
+            top: 0
+        };
+        const suppliedDragPosition = bag.meta.position;
+        const dragPosition = (
+            suppliedDragPosition || 
+            defaultDragPosition
+        );
+        // Supply a fallback 
+        // units object, to handle
+        // operation in pixels 
+        // when not supplied
+        // such as when dragging
+        // from tools.
+        const defaultUnits = {
+            unitsLeft: 'px',
+            unitsTop: 'px',
+        };
+        const suppliedUnits = bag.meta.units;
+        const units = (
+            suppliedUnits || 
+            defaultUnits
+        );
+        const {unitsLeft, unitsTop} = units;
+        const conversionLeft = convertToPx('1' + unitsLeft, {
+            target: event.currentTarget,
+            targetAsContainer: true,
+            rectProperty: 'left',
+            withProperties: {position: 'absolute'}
+        });
+        const positionLeft = (
+            (dropPosition.left - dragPosition.left) / 
+            conversionLeft
+        );
+        const conversionTop = convertToPx('1' + unitsTop, {
+            target: event.currentTarget,
+            targetAsContainer: true,
+            rectProperty: 'top',
+            withProperties: {position: 'absolute'}
+        });
+        // console.log('units', unitsTop, unitsLeft);
+        // console.log('conversions', conversionTop, conversionLeft);
+        // console.log('drag', dragPosition.top, dragPosition.left);
+        // console.log('drop', dropPosition.top, dropPosition.left);
+        const positionTop = (
+            (dropPosition.top - dragPosition.top) / 
+            conversionTop 
+        );
+        const positionStyle = {
+            position: 'absolute',
+            left: positionLeft + unitsLeft,
+            top: positionTop + unitsTop,
+        }
+        const props = {
+            style: positionStyle,
+        }
+        actions.timeBatched.triggerUpdate({
+            id: draggedId,
+            props: props,
         });
     }
     const handleResize = (_event, bag) => {
@@ -254,15 +347,18 @@ const useDemoEditor = params => {
         });
         event.stopPropagation();
     }
+    const dndHandlers = {
+        handlePositionedDragStart: handlePositionedDragStart,
+        handlePositionedDrop: editor.toDnDHandler(handlePositionedDrop),
+        handlePaintDropZone: editor.toDnDHandler(handlePaintDropZone),
+        handleEraseDropZone: editor.toDnDHandler(handleEraseDropZone)
+    }
     const handlers = {
-        handlePositionedDragStart,
         handleResize,
         handleResizeStart,
         handleResizeEnd,
         handleSelect,
         handleDeselect,
-        handlePaintDropZone,
-        handleEraseDropZone,
         handleToggleFix,
         handleDelete,
     }
@@ -277,6 +373,7 @@ const useDemoEditor = params => {
     }
     const bag = {
         ...editor,
+        ...dndHandlers,
         ...handlers,
         ...demoBag,
         ...collectBag,
