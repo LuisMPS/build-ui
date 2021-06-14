@@ -8,8 +8,6 @@ import {isFunction} from "../history/utils/function";
 
 const useEditor = ({
     id,
-    onDrop,
-    onDropDone,
 }) => {
 
     // Warn client if a falsy
@@ -43,8 +41,6 @@ const useEditor = ({
     );
     const dnd = useNodeDnD({
         initialTransferType: 'builder',
-        onDrop: onDrop,
-        onDropDone: onDropDone,
         id: id,
     });
     const actions = useActions();
