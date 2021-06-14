@@ -22,7 +22,7 @@ const GridView = ({
         onDragStart = {!editor.meta.fixed && editor.handlePositionedDragStart}
         onDragEnd = {!editor.meta.fixed && editor.handleDragEnd}
         onDrop = {editor.props.container && editor.handleDrop}
-        onDragEnter = {editor.onDragEnter(editor.handlePaintDropZone)}
+        onDragEnter = {editor.handlePaintDropZone}
         onDragLeave = {editor.handleEraseDropZone}
         draggable = {!editor.meta.fixed}
         // Other Props

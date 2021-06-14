@@ -1,7 +1,6 @@
 import {DnDBuilderHOC} from 'build-ui'
 import useDemoEditor from "../../../../hooks/useDemoEditor";
 import useDemoStyler from '../../../../hooks/useDemoStyler';
-import usePositioner from '../../../../hooks/usePositioner';
 import Resizable from '../../../resize/Resizable';
 import Section from './Section';
 import useStyle from './style/SectionView';
@@ -13,11 +12,8 @@ const SectionView = ({
     id,
     ...props
 }) => {
-    const positioner = usePositioner();
     const editor = useDemoEditor({
         id: id,
-        onDropDone: 
-        positioner.onDropDonePositioned
     });
     const styler = useDemoStyler({
         id: id
@@ -31,8 +27,8 @@ const SectionView = ({
         // DnD Props 
         onDragStart = {!editor.meta.fixed && editor.handlePositionedDragStart}
         onDragEnd = {!editor.meta.fixed && editor.handleDragEnd}
-        onDrop = {editor.handleDrop}
-        onDragEnter = {editor.onDragEnter(editor.handlePaintDropZone)}
+        onDrop = {editor.handlePositionedDrop}
+        onDragEnter = {editor.handlePaintDropZone}
         onDragLeave = {editor.handleEraseDropZone}
         draggable = {!editor.meta.fixed}
         // Resize Props
