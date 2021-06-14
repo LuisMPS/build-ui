@@ -1,12 +1,11 @@
 import React, {useEffect} from 'react';
 import {useDispatch} from 'react-redux';
 
-import {screen, render, fireEvent, createEvent} from '@testing-library/react';
+import {createEvent} from '@testing-library/react';
 import {renderHook} from '@testing-library/react-hooks';
 import '@testing-library/jest-dom';
 
 import Builder from '../../../components/Builder';
-import Workspace from '../../../components/Workspace';
 import DnDListener from '../../../components/DnDListener';
 import useNodeDnD from '../../../hooks/dnd/useNodeDnD';
 import {branch, item, itemid} from '../../../utils/tree';
