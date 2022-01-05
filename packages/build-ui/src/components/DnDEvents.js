@@ -64,17 +64,12 @@ const DnDEvents = ({
     }
 
     // An object to keep reference
-    // of elements that are entered 
-    // and scheduled to be left.
-    const position = useRef({
-        entered: [],
-        left: []
-    });
+    // of current entered element
+    const insideOne = useRef(null);
 
-    // An array to keep reference 
-    // of the elements that current
-    // drag is inside.
-    const inside = useRef([]);
+    // An object to keep reference
+    // of current entered elements
+    const insideMultiple = useRef([]);
 
     // Heavy imperative code below.
     // Manages and implements logic
@@ -110,56 +105,60 @@ const DnDEvents = ({
     const getEnteringEventHandler = type => event => ref => {
         mutateEventStopPropagation(event);
         const elements = getEventElements(event);
-        const entered = ref.current.entered;
-        // Loop that determines whether
-        // there is an element at event
-        // position that can be entered
-        // and has not yet been entered.
         for (const element of elements) {
             const handlers = getHandlers(element, type);
             if (handlers.length === 0) continue;
-            if (entered.includes(element)) break;
-            ref.current.left = ref.current.entered;
-            ref.current.entered = [];
-            break;
-        }
-        // Call all type handlers for
-        // elements that were entered
-        // in this event.
-        for (const element of elements) {
-            if (event.isPropagationStopped()) break;
-            const handlers = getHandlers(element, type);
-            if (handlers.length === 0) continue;
-            if (entered.includes(element)) break;
+            // Element is equal to previously 
+            // entered element. No action needed.
+            if (ref.current === element) return;
+            ref.current = element;
+            if (event.isPropagationStopped()) return;
             mutateEventTarget(event, element);
+            // Call handlers for element, which
+            // was determined to be topmost
+            // and was not topmost before.
             handlers.forEach(handler => handler(event));
-            ref.current.entered = [...ref.current.entered, element];
+            return;
         }
     }
 
-    const getLeavingEventHandler = type => event => ref => {
+    const getLeavingEventHandler = type => (...sideTypes) => event => ref => {
         mutateEventStopPropagation(event);
         const elements = getEventElements(event);
-        const entered = ref.current.entered;
-        const inside = entered.filter(el => elements.includes(el));
-        const outside = entered.filter(el => !elements.includes(el));
-        const willLeave = [...ref.current.left, ...outside];
-        const left = [...new Set(willLeave)];
-        ref.current.entered = inside;
-        ref.current.left = left;
-        // Call all type handlers for
-        // elements that were left in
-        // this event. (by leaving
-        // bounds or by entering an 
-        // uppermost element).
-        for (const element of left) {
-            if (event.isPropagationStopped()) break;
-            const handlers = getHandlers(element, type);
-            if (handlers.length === 0) continue;
-            mutateEventTarget(event, element);
-            handlers.forEach(handler => handler(event));
+        const inside = ref.current;
+        // Cannot leave if there is not an
+        // element which was previously 
+        // entered
+        if (!inside) return;
+        // If there was an element in which
+        // drag was inside of but is no
+        // longer inside of it.
+        let leaveOut = true;
+        for (const element of elements) {
+            if (element != inside) continue;
+            leaveOut = false;
+            break;
         }
-       ref.current.left = [];
+        // If there was an element in which
+        // drag was inside of but there is
+        // another element which also has
+        // a side type listener.
+        let leaveAnother = false;
+        for (const element of elements) {
+            const find = type => getHandlers(element, type).length > 0;
+            const hasHandlers = sideTypes.find(find);
+            if (!hasHandlers) continue;
+            if (element === inside) break;
+            leaveAnother = true;
+            break;
+        }
+        if (!leaveOut && !leaveAnother) return; 
+        if (leaveOut) ref.current = null;
+        if (event.isPropagationStopped()) return;
+        const handlers = getHandlers(inside, type);
+        if (handlers.length === 0) return;
+        mutateEventTarget(event, inside);
+        handlers.forEach(handler => handler(event));
     }
 
     const getInEventHandler = type => event => ref => {
@@ -178,6 +177,7 @@ const DnDEvents = ({
             mutateEventTarget(event, element);
             handlers.forEach(handler => handler(event));
         }
+        ref.current = elements;
     }
 
     const getOutEventHandler = type => event => ref => {
@@ -196,7 +196,6 @@ const DnDEvents = ({
             mutateEventTarget(event, element);
             handlers.forEach(handler => handler(event));
         }
-        ref.current = elements;
     }
 
     // eslint-disable-next-line
@@ -211,37 +210,33 @@ const DnDEvents = ({
 
     // eslint-disable-next-line
     function handleDragEnter(event) {
-        getEnteringEventHandler('dragenter')(event)(position);
+        getEnteringEventHandler('dragenter')(event)(insideOne);
     }
 
     // eslint-disable-next-line
     function handleDragLeave(event) {
-        getLeavingEventHandler('dragleave')(event)(position);
+        getLeavingEventHandler('dragleave')('dragenter')(event)(insideOne);
     }
 
     // eslint-disable-next-line
     function handleDragIn(event) {
-        getInEventHandler('dragin')(event)(inside);
+        getInEventHandler('dragin')(event)(insideMultiple);
     }
 
     // eslint-disable-next-line
     function handleDragOut(event) {
-        getOutEventHandler('dragout')(event)(inside);
+        getOutEventHandler('dragout')(event)(insideMultiple);
     }
 
     useEffect(() => {
         if (!isTransfering) return;
         document.addEventListener(
             'dragover',
-            handleDragOver,
-        );
-        document.addEventListener(
-            'dragover',
-            handleDragEnter,
-        );
-        document.addEventListener(
-            'dragover',
             handleDragLeave,
+        );
+        document.addEventListener(
+            'dragover',
+            handleDragOut,
         );
         document.addEventListener(
             'dragover',
@@ -249,7 +244,11 @@ const DnDEvents = ({
         );
         document.addEventListener(
             'dragover',
-            handleDragOut,
+            handleDragEnter,
+        );
+        document.addEventListener(
+            'dragover',
+            handleDragOver,
         );
         document.addEventListener(
             'drop',
@@ -258,15 +257,11 @@ const DnDEvents = ({
         return () => {
             document.removeEventListener(
                 'dragover',
-                handleDragOver,
-            );
-            document.removeEventListener(
-                'dragover',
-                handleDragEnter,
-            );
-            document.removeEventListener(
-                'dragover',
                 handleDragLeave,
+            );
+            document.removeEventListener(
+                'dragover',
+                handleDragOut,
             );
             document.removeEventListener(
                 'dragover',
@@ -274,7 +269,11 @@ const DnDEvents = ({
             );
             document.removeEventListener(
                 'dragover',
-                handleDragOut,
+                handleDragEnter,
+            );
+            document.removeEventListener(
+                'dragover',
+                handleDragOver,
             );
             document.removeEventListener(
                 'drop',
@@ -353,25 +352,22 @@ const DnDEvents = ({
         handleDrop,
     ]);
 
-    // Cleanup position obj
+    // Cleanup insideOne
     // whenever isDragging
     // is set to false.
     useEffect(() => {
         if (isTransfering) return;
-        position.current = {
-            entered: [],
-            left: []
-        };
+        insideOne.current = null;
     }, [
         isTransfering
     ]);
 
-    // Cleanup inside array
+    // Cleanup insideMultiple
     // whenever isDragging
     // is set to false.
     useEffect(() => {
         if (isTransfering) return;
-        inside.current = [];
+        insideMultiple.current = [];
     }, [
         isTransfering
     ]);
