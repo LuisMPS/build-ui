@@ -12,3 +12,4 @@ legacy.d.ts
 *.orig
 .DS_Store
 
+guide.md
