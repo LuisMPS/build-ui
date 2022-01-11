@@ -125,6 +125,18 @@ describe('useMulticollector', () => {
             expect(collected.nodes).toHaveProperty(id_3);
         });
 
+        test('should collect correctly with finder selector', () => {
+            const finder = state => [state.root];
+            const selector = selectors => (
+                selectors.selectMultipleByFinder(finder)
+            );
+            const hook = renderHook(() => useMultiCollector({
+                selector: selector
+            }), {wrapper: wrapper});
+            const collected = hook.result.current;
+            expect(collected.nodes).toHaveProperty(id_1);
+        });
+
         test('should collect correctly with children', () => {
             const selector = selectors => (
                 selectors.selectChildren(id_2)

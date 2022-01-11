@@ -112,6 +112,18 @@ describe('useCollector', () => {
             expect(collected.node.id).toEqual(id_3);
         });
 
+        test('should collect correctly with finder selector', () => {
+            const finder = state => state.root;
+            const selector = selectors => (
+                selectors.selectByFinder(finder)
+            );
+            const hook = renderHook(() => useCollector({
+                selector: selector
+            }), {wrapper: wrapper});
+            const collected = hook.result.current;
+            expect(collected.node.id).toEqual(id_1);
+        });
+
     });
 
     describe('collector return node', () => {
