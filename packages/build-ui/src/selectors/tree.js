@@ -18,6 +18,7 @@ const getTreeFromHistory = state => state.present;
 
 const getNodeById = (state, id) => state.byIds[id];
 const getNodeByFilter = (state, filter) => values(state.byIds).find(filter);
+const getNodeByFinder = (state, finder) => getNodeById(state, finder(state));
 const getNodeByIndex = (state, index) => state.byIds[state.index[index]];
 const getRootNode = state => getNodeById(state, state.root);
 const getParentNode = (state, id) => getNodeById(state, 
@@ -42,6 +43,11 @@ const getMultipleByFilter = (state, filter) => {
         if (filter(byIds[id])) list.push(id);
         return list;
     }, []);
+    return getMultipleById(state, ...ids);
+}
+
+const getMultipleByFinder = (state, finder) => {
+    const ids = finder(state);
     return getMultipleById(state, ...ids);
 }
 
@@ -116,12 +122,14 @@ export {
     // Single node selectors
     getNodeById,
     getNodeByFilter,
+    getNodeByFinder,
     getNodeByIndex,
     getRootNode,
     getParentNode,
     // Multi node selectors
     getMultipleById,
     getMultipleByFilter,
+    getMultipleByFinder,
     getMultipleByIndex,
     getParentsById,
     getChildrenById,

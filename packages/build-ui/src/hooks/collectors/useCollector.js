@@ -1,12 +1,15 @@
 import {shallowEqual, useSelector} from "react-redux";
 import {getTree} from "../../selectors"
-import {getNodeById, getNodeByIndex, getNodeByFilter, getRootNode, getParentNode, getMetaById, getIndexesForId} from "../../selectors/tree"
+import {getNodeById, getNodeByIndex, getNodeByFilter, getNodeByFinder, getRootNode, getParentNode, getMetaById, getIndexesForId} from "../../selectors/tree"
 
 const selectById = id => store => (
     getNodeById(getTree(store), id)
 );
 const selectByFilter = filter => store => (
     getNodeByFilter(getTree(store), filter)
+);
+const selectByFinder = finder => store => (
+    getNodeByFinder(getTree(store), finder)
 );
 const selectByIndex = index => store => (
     getNodeByIndex(getTree(store), index)
@@ -24,6 +27,7 @@ const useCollector = ({
     const selectors = {
         selectById: selectById,
         selectByFilter: selectByFilter,
+        selectByFinder: selectByFinder,
         selectByIndex: selectByIndex,
         selectParent: selectParent,
         selectRoot: selectRoot,
