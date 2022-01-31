@@ -1,5 +1,5 @@
 import {createAction} from "@reduxjs/toolkit";
-import {applyPatches, produceWithPatches, enablePatches} from "immer";
+import {applyPatches, produceWithPatches, enablePatches, original} from "immer";
 
 enablePatches();
 
@@ -20,6 +20,7 @@ export default function commitHistory(state, action) {
     // State mutations
     state.batch.patches = [];
     state.batch.past = null;
+    if (patches.length === 0) return;
     if (!redo || redo.length === 0) return;
     state.history.timeline.length = state.history.version;
     if (limitExceeded) {
