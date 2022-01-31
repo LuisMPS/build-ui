@@ -1,4 +1,4 @@
-import {shallowEqual, useSelector} from "react-redux";
+import {useSelector} from "react-redux";
 import {getTransfer} from "../../selectors";
 import {getTransferData, getTransferMeta} from "../../selectors/transfer";
 import useEventHelpers from "../events/useEventHelpers";
@@ -9,7 +9,6 @@ const useDnDHelpers = params => {
     );
     const transfer = useSelector(
         transferSelector,
-        shallowEqual,
     );
     const events = useEventHelpers();
     function getDnDEventClientCoords(event) {

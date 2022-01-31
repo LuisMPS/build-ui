@@ -35,7 +35,6 @@ const useCollector = ({
     const chosen = selector(selectors)
     const node = useSelector(
         chosen,
-        shallowEqual
     );
     const id = node && node.id;
     const metaSelector = store => (
@@ -43,7 +42,6 @@ const useCollector = ({
     );
     const meta = useSelector(
         metaSelector,
-        shallowEqual,
     );
     const indexSelector = store => (
         getIndexesForId(getTree(store), id)

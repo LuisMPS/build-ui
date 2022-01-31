@@ -69,7 +69,7 @@ const useMultiCollector = ({
     );
     const indexing = useSelector(
         indexSelector,
-        deepEqual,
+        shallowEqual,
     );
     const handler = {
         get: function(target, name) {

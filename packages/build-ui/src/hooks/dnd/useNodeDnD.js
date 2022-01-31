@@ -1,5 +1,5 @@
 import {useEffect} from "react";
-import {shallowEqual, useSelector} from "react-redux";
+import {useSelector} from "react-redux";
 import {getTransfer} from "../../selectors";
 import {getTransferData, getTransferMeta} from "../../selectors/transfer";
 import useCollector from "../collectors/useCollector";
@@ -48,7 +48,6 @@ const useNodeDnD = ({
     );
     const transfer = useSelector(
         transferSelector,
-        shallowEqual,
     );
     const dnd = useDnD({
         initialTransferType: 
