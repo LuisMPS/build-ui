@@ -148,21 +148,24 @@ export function deepMerge(target, ...sources) {
     const source = sources.shift();
     if (isObject(target) && isObject(source)) {
         Object.keys(source).forEach(key => {
-            if (isObject(source[key])) {
-                if (!(key in target))
+            if (!(key in target)) {
                 Object.assign(target, { [key]: source[key] });
-                else if (isFunction(target[key]))
+            }
+            else if (isObject(source[key])) {                
+                if (isFunction(target[key]))
                 target[key] = (...args) => deepMerge(target[key](...args), source[key]);
-                else 
+                else if (isObject(target[key])) 
                 target[key] = deepMerge(target[key], source[key]);
+                else 
+                Object.assign(target, { [key]: source[key] });
             }
             else if (isFunction(source[key])) {
-              if (!(key in target))
-                Object.assign(target, { [key]: source[key] });
-                else if (isFunction(target[key]))
+                if (isFunction(target[key]))
                 target[key] = (...args) => deepMerge(target[key](...args), source[key](...args));
-                else 
+                else if (isObject(target[key])) 
                 target[key] = (...args) => deepMerge(target[key], source[key](...args));
+                else 
+                Object.assign(target, { [key]: source[key] });
             } 
             else {
                 Object.assign(target, { [key]: source[key] });

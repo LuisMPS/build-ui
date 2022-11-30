@@ -4,26 +4,20 @@
 // Test transfer data
 
 import React, {useEffect} from 'react';
-import {useSelector} from 'react-redux';
 
 import {screen, render, fireEvent} from '@testing-library/react';
 import '@testing-library/jest-dom';
 
 import Builder from '../../../components/Builder';
-import useDnD from '../../../hooks/dnd/useDnD';
-import {getTransfer} from '../../../selectors';
+import useBuildDnD from '../../../hooks/dnd/useBuildDnD';
 import DnDListener from '../../../components/DnDListener';
 
 
 const DnDListenerTestComponent = ({
     onTransfer = () => {}
 }) => {
-    const selector = store => (
-        getTransfer(store)
-    );
-    const transfer = useSelector(
-        selector
-    );
+    const dnd = useBuildDnD({});
+    const transfer = dnd.transfer;
     useEffect(() => {
         // Call function
         // to notify about
@@ -37,8 +31,8 @@ const DnDListenerTestComponent = ({
 }
 
 const DnDHookTestComponent = () => {
-    const dnd = useDnD({
-        initialTransferType: 'test'
+    const dnd = useBuildDnD({
+        transferType: 'test'
     });
     const handleDragCreate = () => {
         dnd.triggerDragStartCreate({
@@ -73,7 +67,7 @@ const DnDHookTestComponent = () => {
     </div>
 }
 
-describe('useDnD', () => {
+describe('useBuildDnD', () => {
 
     describe('DnD transfer data', () => {
 

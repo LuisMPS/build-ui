@@ -1,23 +1,17 @@
 import {useEffect} from "react";
-import {useSelector} from "react-redux";
-import {getTransfer} from "../../selectors";
-import {getTransferData, getTransferMeta} from "../../selectors/transfer";
+import useBuildDnD from "./useBuildDnD";
 import useCollector from "../collectors/useCollector";
 import useMultiCollector from '../collectors/useMultiCollector';
 import useActions from "../useActions";
-import useDnD from "./useDnD";
-import useDnDHelpers from "./useDnDHelpers";
 
 const useNodeDnD = ({
     id,
-    initialTransferType,
+    transferType,
 }) => {
-
     // Warn client if a falsy
     // id was received, as this
     // will cause unpredictable 
     // behavior.
-
     useEffect(() => {
         if (id) return;
         console.warn(`
@@ -28,7 +22,10 @@ const useNodeDnD = ({
             behavior.
         `);
     }, [id]);
-
+    const dnd = useBuildDnD({
+        transferType: 
+        transferType,
+    });
     const nodeSelector = selectors => (
         selectors.selectById(id)
     );
@@ -43,30 +40,11 @@ const useNodeDnD = ({
         selector: multiSelector
     });
     const nodeParents = multicollect.nodes;
-    const transferSelector = store => (
-        getTransfer(store)
-    );
-    const transfer = useSelector(
-        transferSelector,
-    );
-    const dnd = useDnD({
-        initialTransferType: 
-        initialTransferType
-    });
-    const transferType = (
-        dnd.transferType
-    );
-    const helpers = useDnDHelpers({
-        transferType: transferType,
-    });
     const actions = useActions();
     function triggerDragStart(drag) {
         dnd.triggerDragStartMove({
+            ...drag,
             data: node,
-            meta: drag.meta,
-            // Transfer type
-            // set by DnD hook
-            // composition
         });
     }
     function triggerDragEnd() {
@@ -80,19 +58,13 @@ const useNodeDnD = ({
         triggerDragEnd();
     }
     function handleDrop(event, position = null) {
-        const data = getTransferData(transfer);
-        // In case drop is not
-        // caused by an internal
-        // action, such as dropping
-        // a file or image.
-        if (!data) return;
-        const meta = getTransferMeta(transfer);
-        const create = meta.create;
+        if (!dnd.isTransferingType) return;
+        const create = dnd.transfer.meta.create;
         if (create) handleDropCreate(event, position);
         if (!create) handleDropMove(event, position);
     }
     function handleDropCreate(event, position) {
-        const data = getTransferData(transfer);
+        const data = dnd.transfer.data;
         actions.timeBatched.triggerCreate({
             targetId: id,
             node: data,
@@ -101,25 +73,13 @@ const useNodeDnD = ({
         event.stopPropagation()
     }
     function handleDropMove(event, position) {
-        const data = getTransferData(transfer);
+        const data = dnd.transfer.data;
         actions.timeBatched.triggerMove({
-            id: data.id,
             targetId: id,
+            id: data.id,
             position: position,
         });
         event.stopPropagation()
-    }
-    function handleChildYDrop(event, position) {
-        const {top} = helpers.getDnDEventPosition(event);
-        const offset = top ? 0 : 1;
-        const dropPosition = position + offset;
-        handleDrop(event, dropPosition);
-    }
-    function handleChildXDrop(event, position) {
-        const {left} = helpers.getDnDEventPosition(event);
-        const offset = left ? 0 : 1;
-        const dropPosition = position + offset;
-        handleDrop(event, dropPosition);
     }
     function toDnDHandler(handler) {
         // Must wrap handlers with
@@ -128,11 +88,15 @@ const useNodeDnD = ({
         // such as "recursive" dnd
         // events, like dropping
         // a component into itself.
-        const bag = helpers.getDragAndDrop();
-        if (!bag) {
+        
+        if (!dnd.transfer.data) {
             return handler;
         }
-        const transferID = bag.transfer.id;
+        const transferID = (
+            dnd.transfer.meta.create 
+            ? dnd.transfer.data.root
+            : dnd.transfer.data.id
+        );
         const isRecursive = (
             nodeParents[transferID] ||
             transferID === id
@@ -145,14 +109,8 @@ const useNodeDnD = ({
         // invalid.
         return undefined;
     }
-    const dndBag = {
-        transferType: dnd.transferType,
-        setTransferType: dnd.setTransferType,
-    }
     const handlers = {
         handleDrop: toDnDHandler(handleDrop),
-        handleChildXDrop: toDnDHandler(handleChildXDrop),
-        handleChildYDrop: toDnDHandler(handleChildYDrop),
         handleDragStart,
         handleDragEnd,
     }
@@ -163,12 +121,17 @@ const useNodeDnD = ({
     const wrappers = {
         toDnDHandler,
     }
+    const {
+        triggerDragEnd: _triggerDragEnd,
+        triggerDragStartCreate,
+        triggerDragStartMove,
+        ...dndBag
+    } = dnd;
     const bag = {
-        ...dndBag,
         ...handlers,
         ...triggers,
-        ...helpers,
         ...wrappers,
+        ...dndBag,
     }
     return bag;
 }

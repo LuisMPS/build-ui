@@ -9,14 +9,14 @@ import Builder from '../../../components/Builder';
 import DnDListener from '../../../components/DnDListener';
 import useNodeDnD from '../../../hooks/dnd/useNodeDnD';
 import {branch, item, itemid} from '../../../utils/tree';
-import {startTransfer} from '../../../slices/transfer';
+import {updateTransfer} from '../../../slices/transfer';
 
 const NodeDnDHookTestComponent = ({
     id,
 }) => {
     const dnd = useNodeDnD({
         id: id,
-        initialTransferType: 'test' 
+        transferType: 'test' 
     });
     return <DnDListener
         listenTransferType = 'test'
@@ -34,7 +34,7 @@ const DnDListenerTestComponent = ({
     const dispatch = useDispatch();
     useEffect(() => {
         if (!transfering) return;
-        dispatch(startTransfer({
+        dispatch(updateTransfer({
             data: true,
             meta: true,
             type: transferType,
@@ -84,7 +84,7 @@ describe('useNodeDnD', () => {
             }
             const hook = renderHook(() => useNodeDnD({
                 id: id,
-                initialTransferType: 'test'
+                transferType: 'test'
             }), options);
             const dnd = hook.result.current;
             expect(dnd.isTransfering).toBe(false);
@@ -101,7 +101,7 @@ describe('useNodeDnD', () => {
             }
             const hook = renderHook(() => useNodeDnD({
                 id: id,
-                initialTransferType: 'test',
+                transferType: 'test',
             }), options);
             const dnd = hook.result.current;
             expect(dnd.isTransfering).toBe(true);
@@ -118,7 +118,7 @@ describe('useNodeDnD', () => {
             }
             const hook = renderHook(() => useNodeDnD({
                 id: id,
-                initialTransferType: 'test'
+                transferType: 'test'
             }), options);
             const dnd = hook.result.current;
             expect(dnd.isTransferingType).toBe(false);
@@ -135,107 +135,10 @@ describe('useNodeDnD', () => {
             }
             const hook = renderHook(() => useNodeDnD({
                 id: id,
-                initialTransferType: 'test'
+                transferType: 'test'
             }), options);
             const dnd = hook.result.current;
             expect(dnd.isTransferingType).toBe(true);
-        });
-
-    });
-
-    describe('node DnD util functions', () => {
-
-        const wrapper = ({children}) => (
-            <Builder initialTree = {initialTree}>
-                {children}
-            </Builder>
-        );
-
-        const mockClientRect = {
-            top: 100,
-            left: 100,
-            x: 100,
-            y: 100,
-            width: 500,
-            height: 200,
-        };
-
-        const mockElement = document.createElement(
-            'div'
-        );
-
-        // Necessary to test event position
-        // since it is position dependent 
-        // and jsdom does not support 
-        // layout calculations.
-        beforeAll(() => {
-            jest.spyOn(HTMLElement.prototype, 'getBoundingClientRect')
-            HTMLElement.prototype.getBoundingClientRect.mockImplementation(() => (
-                mockClientRect
-            ));
-        })
-
-        // Restore mock implementation
-        // for further tests.
-        afterAll(() => {
-            HTMLElement.prototype.getBoundingClientRect.mockRestore();
-        });
-
-
-        test('should return position from getEventPosition for HTML5 API', () => {
-            const hook = renderHook(() => useNodeDnD({
-                id: id,
-                initialTransferType: 'test'
-            }), {wrapper: wrapper});
-            const dnd = hook.result.current;
-            const dropEvent = createEvent('drop', mockElement);
-            // Mutate event directly since
-            // jsdom (react testing library?)
-            // does not support setting event
-            // position in options, as it does
-            // for other events.
-            dropEvent.clientX = mockClientRect.left + mockClientRect.width / 4;
-            dropEvent.clientY = mockClientRect.top + mockClientRect.height / 4;
-            // Mutate event directly
-            // to set currentTarget
-            // property to mock HTML
-            // element since it is not
-            // bound by jsdom automatically.
-            Object.defineProperty(dropEvent, 'currentTarget', {value: mockElement});
-            // Matcher definition
-            expect(dnd.getDnDEventPosition(dropEvent)).toEqual({
-                top: true,
-                bottom: false,
-                left: true,
-                right: false,
-            });
-        });
-
-        test('should return position from getEventPosition for Touch API', () => {
-            const hook = renderHook(() => useNodeDnD({
-                id: id,
-                initialTransferType: 'test'
-            }), {wrapper: wrapper});
-            const dnd = hook.result.current;
-            const dropEvent = createEvent.touchEnd(document, {
-                changedTouches: [{
-                    clientX: mockClientRect.left + 3 * mockClientRect.width / 4,
-                    clientY: mockClientRect.top + mockClientRect.height / 4,
-                }]
-            });
-            // Mutate event directly
-            // to set currentTarget
-            // property to mock HTML
-            // element since it is not
-            // bound by jsdom automatically.
-            Object.defineProperty(dropEvent, 'currentTarget', {value: mockElement});
-            // Matcher definition
-            expect(dnd.getDnDEventPosition(dropEvent)).toEqual({
-                top: true,
-                bottom: false,
-                left: false,
-                right: true,
-            });
         });
 
     });

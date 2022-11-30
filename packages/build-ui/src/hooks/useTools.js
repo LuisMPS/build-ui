@@ -2,15 +2,9 @@ import useToolDnD from "./dnd/useToolDnD";
 
 const useTools = () => {
     const dnd = useToolDnD({
-        initialTransferType: 
-        'builder',
+        transferType: 'builder',
     });
-    const {
-        transferType,
-        setTransferType,
-        ...bag
-    } = dnd;
-    return bag;
+    return dnd;
 } 
 
 export default useTools;

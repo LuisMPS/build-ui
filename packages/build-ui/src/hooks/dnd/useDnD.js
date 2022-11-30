@@ -1,57 +1,44 @@
-import {useState} from "react";
-import {useDispatch} from "react-redux";
-import {startTransfer, endTransfer} from "../../slices/transfer";
+import {useSelector, useDispatch} from "react-redux";
+import {getTransfer} from "../../selectors";
+import {endTransfer, updateTransfer} from "../../slices/transfer";
 
 const useDnD = ({
-    initialTransferType,
+    transferType,
 }) => {
-    const [transferType, setTransferType] = (
-        useState(initialTransferType)
-    );
     const dispatch = useDispatch();
-    function triggerDragStart(drag) {
-        dispatch(startTransfer({
-            data: drag.data,
-            meta: drag.meta,
-            type: transferType,
-        }))
+    const transferSelector = store => (
+        getTransfer(store)
+    );
+    const transfer = useSelector(
+        transferSelector,
+    );
+    const isTransfering = Boolean(
+        transfer.data
+    );
+    const isTransferingType = (
+        isTransfering && 
+        transfer.type === transferType
+    );
+    function triggerUpdate(transfer) {
+        dispatch(updateTransfer(transfer));
     }
-    function triggerDragStartMove(drag) {
-        const meta = {
-            create: false,
-            ...drag.meta || {},
-        };
-        triggerDragStart({
-            data: drag.data,
-            meta: meta,
-            type: transferType,
-        });
+    function triggerEnd() {
+        dispatch(endTransfer({}));
     }
-    function triggerDragStartCreate(drag) {
-        const meta = {
-            create: true,
-            ...drag.meta || {},
-        }
-        triggerDragStart({
-            data: drag.data,
-            meta: meta,
-            type: transferType,
-        });
+    const data = {
+        transfer: transfer,
     }
-    function triggerDragEnd() {
-        dispatch(endTransfer({}))
-    }
-    const dndBag = {
-        transferType: transferType,
-        setTransferType: setTransferType,
-    }
-    const triggers = {
-        triggerDragStartCreate,
-        triggerDragStartMove,
-        triggerDragEnd,
+    const flags = {
+        isTransfering: isTransfering,
+        isTransferingType: isTransferingType,
     };
+    const triggers = {
+        triggerUpdate,
+        triggerEnd,
+    }
     const bag = {
-        ...dndBag,
+        ...data,
+        ...flags,
         ...triggers,
     }
     return bag;

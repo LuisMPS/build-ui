@@ -5,3 +5,7 @@ export function isFunction(fn) {
 export function identity(arg) {
     return arg;
 }
+
+export function combine(...funcs) {
+    return (...args) => funcs.map((func => func(...args)));
+}

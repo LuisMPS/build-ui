@@ -1,19 +1,13 @@
-import useDnD from "./useDnD";
+import useBuildDnD from "./useBuildDnD";
 import {plainBranch} from "../../utils/tree";
 
 const useToolDnD = ({
-    initialTransferType,
+    transferType,
 }) => {
-    const dnd = useDnD({
-        initialTransferType:
-        initialTransferType,
+    const dnd = useBuildDnD({
+        transferType:
+        transferType,
     });
-    const transferType = (
-        dnd.transferType
-    );
-    const setTransferType = (
-        dnd.setTransferType
-    );
     function triggerDragStart(drag) {
         const data = plainBranch(drag.data);
         dnd.triggerDragStartCreate({
@@ -27,10 +21,6 @@ const useToolDnD = ({
     function handleDragEnd() {
         triggerDragEnd();
     }
-    const dndBag = {
-        transferType: transferType,
-        setTransferType: setTransferType,
-    }
     const handlers = {
         handleDragEnd,
     }
@@ -39,7 +29,6 @@ const useToolDnD = ({
         triggerDragEnd,
     }
     const bag = {
-        ...dndBag,
         ...handlers,
         ...triggers
     }

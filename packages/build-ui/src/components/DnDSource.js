@@ -1,4 +1,4 @@
-import React, {useEffect, useRef, useState} from "react"
+import React, {useEffect, useState, useRef} from "react"
 import useShareRef from "../hooks/useShareRef";
 import useBuilderContext from "../hooks/useBuilderContext";
 import useEventCallback from "../hooks/events/useEventCallback";
@@ -11,11 +11,10 @@ const DnDSource = React.forwardRef(function DnDSource({
     onDragStart,
     onDragEnter,
     onDragLeave,
-    onDragIn,
-    onDragOut,
+    onDrag,
     allowTouch = true,
     dragTouchTimeThreshold = 200,
-    // dragTouchMoveThreshold,
+    dragTypes = 'any',
     isDragging = false, 
     as = 'div',
     ...rest
@@ -42,22 +41,27 @@ const DnDSource = React.forwardRef(function DnDSource({
             forwarding in underlying
             node to attach listeners.
         `);
-    }, [box])
+    }, [box]);
+
+    useEffect(() => {
+        if (!box.current) return;
+        box.current.dragTypes = dragTypes.split(" ");
+    }, [box, dragTypes]);
 
     // Events that go attached to 
     // this DOM node and trigger
     // react synthetic events.
 
-    const handleDragStartMouse = useEventCallback(event => {
+    const handleDragStartMouse = useEventCallback((event, ...args) => {
         event.stopPropagation();
         // Do not start drag operation
         // if there is one currently 
         // running, (some mobile browsers
         // will trigger both drag start
-        // and mouse down events for drag
+        // and touch down events for drag
         // start).
         if (dragTouchActive) return;
-        batch(() => onDragStart(event));
+        batch(() => onDragStart(event, ...args));
         draggingBox.current = true;
     });
 
@@ -74,7 +78,7 @@ const DnDSource = React.forwardRef(function DnDSource({
         });
     });
 
-    const handleDragStartTouch = useEventCallback(event => {
+    const handleDragStartTouch = useEventCallback((event, ...args) => {
         // Must re define currentTarget
         // because drag start touch is 
         // handled asynchronously.
@@ -87,18 +91,18 @@ const DnDSource = React.forwardRef(function DnDSource({
         batch(() => {
             setDragTouchActive(false);
             setDragTouchEvent(null);
-            onDragStart(event)
+            onDragStart(event, ...args);
         });
         draggingBox.current = true;
     });
 
-    const handleDragEndMouse = useEventCallback(event => {
+    const handleDragEndMouse = useEventCallback((event, ...args) => {
         if (!draggingBox.current) return;
-        batch(() => onDragEnd(event));
+        batch(() => onDragEnd(event, ...args));
         draggingBox.current = false;
     });
 
-    const handleDragEndTouch = useEventCallback(event => {
+    const handleDragEndTouch = useEventCallback((event, ...args) => {
         // Restart touch state in case
         // there is not an an ongoing drag 
         // operation for this Source 
@@ -130,7 +134,7 @@ const DnDSource = React.forwardRef(function DnDSource({
                 {value: box.current,
                 configurable: true}
             );
-            batch(() => onDragEnd(event));
+            batch(() => onDragEnd(event, ...args));
             draggingBox.current = false;
         }, 0);
     });
@@ -142,6 +146,10 @@ const DnDSource = React.forwardRef(function DnDSource({
 
     const handleAllowDragOverMouse = useEventCallback(event => {
         event.preventDefault();
+    });
+
+    const handleDrag = useEventCallback((...args) => {
+        batch(() => onDrag(...args));
     });
 
     // Effect to attach event
@@ -165,6 +173,10 @@ const DnDSource = React.forwardRef(function DnDSource({
             'dragover',
             handleAllowDragOverMouse
         );
+        if (onDrag) ref.addEventListener(
+            'drag',
+            handleDrag
+        );
         return () => {
             if (onDragStart && ref) ref.removeEventListener(
                 'dragstart',
@@ -178,15 +190,21 @@ const DnDSource = React.forwardRef(function DnDSource({
                 'dragover',
                 handleAllowDragOverMouse,
             );
+            if (onDrag && ref) ref.removeEventListener(
+                'drag',
+                handleDrag
+            );
         }
     }, [
         box,
         onDragStart,
         onDragEnd,
         onDrop,
+        onDrag,
         handleDragStartMouse,
         handleDragEndMouse,
-        handleAllowDragOverMouse
+        handleAllowDragOverMouse,
+        handleDrag,
     ]);
 
     // Effect to attach event
@@ -206,6 +224,10 @@ const DnDSource = React.forwardRef(function DnDSource({
             'touchend',
             handleDragEndTouch
         );
+        if (onDrag) ref.addEventListener(
+            'touchmove',
+            handleDrag
+        ); 
         return () => {
             if (onDragStart && ref) ref.removeEventListener(
                 'touchstart',
@@ -215,14 +237,20 @@ const DnDSource = React.forwardRef(function DnDSource({
                 'touchend',
                 handleDragEndTouch,
             );
+            if (onDrag && ref) ref.removeEventListener(
+                'touchmove',
+                handleDrag,
+            );
         }
     }, [
         box,
         allowTouch,
         onDragStart,
         onDragEnd,
+        onDrag,
         handlePreDragStartTouch,
         handleDragEndTouch,
+        handleDrag,
     ]);
 
     // Effect to handle drag start
@@ -251,32 +279,23 @@ const DnDSource = React.forwardRef(function DnDSource({
     // Get event listener 
     // registration from 
     // context.
-
     const context = useBuilderContext();
     const events = context.events;
 
-    const handleDragOver = useEventCallback(event => {
-        batch(() => onDragOver(event));
+    const handleDragOver = useEventCallback((...args) => {
+        batch(() => onDragOver(...args));
     });
 
-    const handleDragEnter = useEventCallback(event => {
-        batch(() => onDragEnter(event));
+    const handleDragEnter = useEventCallback((...args) => {
+        batch(() => onDragEnter(...args));
     });
 
-    const handleDragLeave = useEventCallback(event => {
-        batch(() => onDragLeave(event));
+    const handleDragLeave = useEventCallback((...args) => {
+        batch(() => onDragLeave(...args));
     });
 
-    const handleDragIn = useEventCallback(event => {
-        batch(() => onDragIn(event));
-    });
-
-    const handleDragOut = useEventCallback(event => {
-        batch(() => onDragOut(event));
-    });
-
-    const handleDrop = useEventCallback(event => {
-        batch(() => onDrop(event));
+    const handleDrop = useEventCallback((...args) => {
+        batch(() => onDrop(...args));
     });
         
     // Effect to register event
@@ -302,16 +321,6 @@ const DnDSource = React.forwardRef(function DnDSource({
             'dragleave',
             handleDragLeave,
         );
-        if (onDragIn) events.addEventListener(
-            ref,
-            'dragin',
-            handleDragIn,
-        );
-        if (onDragOut) events.addEventListener(
-            ref,
-            'dragout',
-            handleDragOut,
-        );
         if (onDrop) events.addEventListener(
             ref,
             'drop',
@@ -333,16 +342,6 @@ const DnDSource = React.forwardRef(function DnDSource({
                 'dragleave',
                 handleDragLeave,
             );
-            if (onDragIn && ref) events.removeEventListener(
-                ref,
-                'dragin',
-                handleDragIn,
-            );
-            if (onDragOut && ref) events.removeEventListener(
-                ref,
-                'dragout',
-                handleDragOut,
-            );
             if (onDrop && ref) events.removeEventListener(
                 ref,
                 'drop',
@@ -355,14 +354,10 @@ const DnDSource = React.forwardRef(function DnDSource({
         onDragOver,
         onDragEnter,
         onDragLeave,
-        onDragIn,
-        onDragOut,
         onDrop,
         handleDragOver,
         handleDragEnter,
         handleDragLeave,
-        handleDragIn,
-        handleDragOut,
         handleDrop,
         isDragging,
     ]);

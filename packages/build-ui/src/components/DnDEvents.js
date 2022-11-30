@@ -1,25 +1,13 @@
 import {useEffect, useRef} from 'react';
-import {useSelector} from 'react-redux';
+import useDnD from '../hooks/dnd/useDnD';
 import useEventHelpers from '../hooks/events/useEventHelpers';
-import {getTransfer} from '../selectors';
-import {getTransferData} from '../selectors/transfer';
 
 const DnDEvents = ({
     listeners,
 }) => {
 
-    const selector = store => (
-        getTransfer(store)
-    );
-    const transfer = useSelector(
-        selector
-    );
-    const data = getTransferData(
-        transfer
-    );
-    const isTransfering = Boolean(
-        data
-    );
+    const dnd = useDnD({});
+    const isTransfering = dnd.isTransfering;
 
     const events = useEventHelpers();
 
@@ -65,11 +53,7 @@ const DnDEvents = ({
 
     // An object to keep reference
     // of current entered element
-    const insideOne = useRef(null);
-
-    // An object to keep reference
-    // of current entered elements
-    const insideMultiple = useRef([]);
+    const dragEnterElements = useRef({});
 
     // Heavy imperative code below.
     // Manages and implements logic
@@ -86,7 +70,7 @@ const DnDEvents = ({
         return handlers;
     }
 
-    const getBubblingEventHandler = type => event => {
+    const getPositionedEventHandler = type => event => {
         mutateEventStopPropagation(event);
         const elements = getEventElements(event);
         // Loop through all elements
@@ -103,129 +87,65 @@ const DnDEvents = ({
     }
 
     const getEnteringEventHandler = type => event => ref => {
-        mutateEventStopPropagation(event);
         const elements = getEventElements(event);
+        const highestElements = {};
         for (const element of elements) {
             const handlers = getHandlers(element, type);
             if (handlers.length === 0) continue;
-            // Element is equal to previously 
-            // entered element. No action needed.
-            if (ref.current === element) return;
-            ref.current = element;
-            if (event.isPropagationStopped()) return;
+            const dragTypes = element.dragTypes || [];
+            for (const dragType of dragTypes) {
+                if (highestElements[dragType]) continue;
+                highestElements[dragType] = element;
+            }
+        }
+        for (const [dragType, element] of Object.entries(highestElements)) {
+            if (ref.current[dragType] === element) continue;
+            ref.current[dragType] = element;
             mutateEventTarget(event, element);
-            // Call handlers for element, which
-            // was determined to be topmost
-            // and was not topmost before.
-            handlers.forEach(handler => handler(event));
-            return;
-        }
-    }
-
-    const getLeavingEventHandler = type => (...sideTypes) => event => ref => {
-        mutateEventStopPropagation(event);
-        const elements = getEventElements(event);
-        const inside = ref.current;
-        // Cannot leave if there is not an
-        // element which was previously 
-        // entered
-        if (!inside) return;
-        // If there was an element in which
-        // drag was inside of but is no
-        // longer inside of it.
-        let leaveOut = true;
-        for (const element of elements) {
-            if (element != inside) continue;
-            leaveOut = false;
-            break;
-        }
-        // If there was an element in which
-        // drag was inside of but there is
-        // another element which also has
-        // a side type listener.
-        let leaveAnother = false;
-        for (const element of elements) {
-            const find = type => getHandlers(element, type).length > 0;
-            const hasHandlers = sideTypes.find(find);
-            if (!hasHandlers) continue;
-            if (element === inside) break;
-            leaveAnother = true;
-            break;
-        }
-        if (!leaveOut && !leaveAnother) return; 
-        if (leaveOut) ref.current = null;
-        if (event.isPropagationStopped()) return;
-        const handlers = getHandlers(inside, type);
-        if (handlers.length === 0) return;
-        mutateEventTarget(event, inside);
-        handlers.forEach(handler => handler(event));
-    }
-
-    const getInEventHandler = type => event => ref => {
-        mutateEventStopPropagation(event);
-        const elements = getEventElements(event);
-        const insideBefore = ref.current;
-        // Call all type handlers for
-        // elements that are events
-        // position and were not in
-        // previous event's position.
-        for (const element of elements) {
-            if (event.isPropagationStopped()) break;
             const handlers = getHandlers(element, type);
-            if (handlers.length === 0) continue;
-            if (insideBefore.includes(element)) continue;
-            mutateEventTarget(event, element);
-            handlers.forEach(handler => handler(event));
+            handlers.forEach(handler => handler(event, dragType));
         }
-        ref.current = elements;
     }
 
-    const getOutEventHandler = type => event => ref => {
-        mutateEventStopPropagation(event);
+    const getLeavingEventHandler = type => event => ref => {
         const elements = getEventElements(event);
-        const insideBefore = ref.current;
-        // Call all type handlers for
-        // elements that were in previous
-        // event's position and are not 
-        // in current event's position.
-        for (const element of insideBefore) {
-            if (event.isPropagationStopped()) break;
-            const handlers = getHandlers(element, type);
+        const highestElements = {};
+        for (const element of elements) {
+            const handlers = getHandlers(element, 'dragenter');
             if (handlers.length === 0) continue;
-            if (elements.includes(element)) continue;
+            const dragTypes = element.dragTypes || [];
+            for (const dragType of dragTypes) {
+                if (highestElements[dragType]) continue;
+                highestElements[dragType] = element;
+            }
+        }
+        for (const [dragType, element] of Object.entries(ref.current)) {
+            if (highestElements[dragType] === element) continue;
+            delete ref.current[dragType];
             mutateEventTarget(event, element);
-            handlers.forEach(handler => handler(event));
+            const handlers = getHandlers(element, type);
+            handlers.forEach(handler => handler(event, dragType));
         }
     }
 
     // eslint-disable-next-line
     function handleDrop(event) {
-        getBubblingEventHandler('drop')(event);
+        getPositionedEventHandler('drop')(event);
     }
 
     // eslint-disable-next-line
     function handleDragOver(event) {
-        getBubblingEventHandler('dragover')(event);
+        getPositionedEventHandler('dragover')(event);
     }
 
     // eslint-disable-next-line
     function handleDragEnter(event) {
-        getEnteringEventHandler('dragenter')(event)(insideOne);
+        getEnteringEventHandler('dragenter')(event)(dragEnterElements);
     }
 
     // eslint-disable-next-line
     function handleDragLeave(event) {
-        getLeavingEventHandler('dragleave')('dragenter')(event)(insideOne);
-    }
-
-    // eslint-disable-next-line
-    function handleDragIn(event) {
-        getInEventHandler('dragin')(event)(insideMultiple);
-    }
-
-    // eslint-disable-next-line
-    function handleDragOut(event) {
-        getOutEventHandler('dragout')(event)(insideMultiple);
+        getLeavingEventHandler('dragleave')(event)(dragEnterElements);
     }
 
     useEffect(() => {
@@ -233,14 +153,6 @@ const DnDEvents = ({
         document.addEventListener(
             'dragover',
             handleDragLeave,
-        );
-        document.addEventListener(
-            'dragover',
-            handleDragOut,
-        );
-        document.addEventListener(
-            'dragover',
-            handleDragIn,
         );
         document.addEventListener(
             'dragover',
@@ -261,14 +173,6 @@ const DnDEvents = ({
             );
             document.removeEventListener(
                 'dragover',
-                handleDragOut,
-            );
-            document.removeEventListener(
-                'dragover',
-                handleDragIn,
-            );
-            document.removeEventListener(
-                'dragover',
                 handleDragEnter,
             );
             document.removeEventListener(
@@ -285,8 +189,6 @@ const DnDEvents = ({
         handleDragOver,
         handleDragEnter,
         handleDragLeave,
-        handleDragIn,
-        handleDragOut,
         handleDrop,
     ]);
 
@@ -294,7 +196,7 @@ const DnDEvents = ({
         if (!isTransfering) return;
         document.addEventListener(
             'touchmove',
-            handleDragOver
+            handleDragLeave
         );
         document.addEventListener(
             'touchmove',
@@ -302,15 +204,7 @@ const DnDEvents = ({
         );
         document.addEventListener(
             'touchmove',
-            handleDragLeave
-        );
-        document.addEventListener(
-            'touchmove',
-            handleDragIn
-        );
-        document.addEventListener(
-            'touchmove',
-            handleDragOut
+            handleDragOver
         );
         document.addEventListener(
             'touchend',
@@ -319,23 +213,15 @@ const DnDEvents = ({
         return () => {
             document.removeEventListener(
                 'touchmove',
-                handleDragOver,
+                handleDragLeave,
             );
             document.removeEventListener(
                 'touchmove',
-                handleDragEnter,
+                handleDragEnter
             );
             document.removeEventListener(
                 'touchmove',
-                handleDragLeave
-            );
-            document.removeEventListener(
-                'touchmove',
-                handleDragIn
-            );
-            document.removeEventListener(
-                'touchmove',
-                handleDragOut
+                handleDragOver
             );
             document.removeEventListener(
                 'touchend',
@@ -347,30 +233,16 @@ const DnDEvents = ({
         handleDragOver,
         handleDragEnter,
         handleDragLeave,
-        handleDragIn,
-        handleDragOut,
         handleDrop,
     ]);
 
-    // Cleanup insideOne
+    // Cleanup dragEnterElements
     // whenever isDragging
     // is set to false.
     useEffect(() => {
         if (isTransfering) return;
-        insideOne.current = null;
-    }, [
-        isTransfering
-    ]);
-
-    // Cleanup insideMultiple
-    // whenever isDragging
-    // is set to false.
-    useEffect(() => {
-        if (isTransfering) return;
-        insideMultiple.current = [];
-    }, [
-        isTransfering
-    ]);
+        dragEnterElements.current = {};
+    }, [isTransfering]);
 
     return null;
 

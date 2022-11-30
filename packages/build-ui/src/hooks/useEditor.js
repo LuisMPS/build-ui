@@ -40,8 +40,8 @@ const useEditor = ({
         collected.meta
     );
     const dnd = useNodeDnD({
-        initialTransferType: 'builder',
         id: id,
+        transferType: 'builder'
     });
     const actions = useActions();
     function getEventValue(event) {
@@ -105,26 +105,15 @@ const useEditor = ({
         props: props,
         meta: meta,
     }
-    const {
-        isTransfering,
-        isTransferingType,
-        transferType,
-        setTransferType,
-        ...dndBag
-    } = dnd;
     const handlers = {
         handleUpdate,
         handleMetaUpdate,
         handlePanel,
     }
-    const flags = {
-        isTransfering: isTransferingType
-    }
     const bag = {
         ...editorBag,
-        ...dndBag,
+        ...dnd,
         ...handlers,
-        ...flags,
     }
     return bag;
 }
