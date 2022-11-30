@@ -18,9 +18,10 @@ import useView from './hooks/useView'
 import useCollector from './hooks/collectors/useCollector'
 import useMultiCollector from './hooks/collectors/useMultiCollector'
 
-import useDnDHelpers from './hooks/dnd/useDnDHelpers'
+import useDnD from './hooks/dnd/useDnD'
 import useNodeDnD from './hooks/dnd/useNodeDnD'
 import useToolDnD from './hooks/dnd/useToolDnD'
+import useDnDHelpers from './hooks/dnd/useDnDHelpers'
 
 import {branch, item, itemid} from './utils/tree'
 
@@ -40,9 +41,10 @@ export {
     useView,
     useCollector,
     useMultiCollector,
-    useDnDHelpers,
+    useDnD,
     useNodeDnD,
     useToolDnD,
+    useDnDHelpers,
     branch,
     item,
     itemid,
