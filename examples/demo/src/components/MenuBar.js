@@ -37,7 +37,6 @@ const MenuBar = ({
     } = builder;
 
     const handleSave = () => {
-        // console.log(json());
         const content = JSON.stringify(json());
         const file = new Blob([content], {type: 'application/json'});
         const link = URL.createObjectURL(file);
@@ -47,6 +46,8 @@ const MenuBar = ({
 
     const handleLoad = event => {
         const file = event.target.files[0];
+        event.target.value = null;
+        if (!file) return;
         // Must manage with effect
         // since reading file
         // will be done async.
@@ -62,7 +63,6 @@ const MenuBar = ({
         if (!saving) return;
         saver.current.click();
         URL.revokeObjectURL(saveLink);
-        setLink(null);
         setSaving(false);
     }, [saving, saveLink]);
 
@@ -166,7 +166,6 @@ const MenuBar = ({
         />
 
         <Button 
-            type = 'file'
             component = 'label'
             color = 'primary'
             variant = 'outlined'
@@ -177,7 +176,7 @@ const MenuBar = ({
                 hidden = {true}
                 type = 'file'
                 name = 'load_tree'
-                onChange = {handleLoad}
+                onInput = {handleLoad}
             />
         </Button>
 

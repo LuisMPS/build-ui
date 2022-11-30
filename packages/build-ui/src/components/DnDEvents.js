@@ -294,15 +294,11 @@ const DnDEvents = ({
         if (!isTransfering) return;
         document.addEventListener(
             'touchmove',
-            handleDragOver
-        );
-        document.addEventListener(
-            'touchmove',
-            handleDragEnter
-        );
-        document.addEventListener(
-            'touchmove',
             handleDragLeave
+        );
+        document.addEventListener(
+            'touchmove',
+            handleDragOut
         );
         document.addEventListener(
             'touchmove',
@@ -310,7 +306,11 @@ const DnDEvents = ({
         );
         document.addEventListener(
             'touchmove',
-            handleDragOut
+            handleDragEnter
+        );
+        document.addEventListener(
+            'touchmove',
+            handleDragOver
         );
         document.addEventListener(
             'touchend',
@@ -319,15 +319,11 @@ const DnDEvents = ({
         return () => {
             document.removeEventListener(
                 'touchmove',
-                handleDragOver,
+                handleDragLeave,
             );
             document.removeEventListener(
                 'touchmove',
-                handleDragEnter,
-            );
-            document.removeEventListener(
-                'touchmove',
-                handleDragLeave
+                handleDragOut,
             );
             document.removeEventListener(
                 'touchmove',
@@ -335,7 +331,11 @@ const DnDEvents = ({
             );
             document.removeEventListener(
                 'touchmove',
-                handleDragOut
+                handleDragEnter
+            );
+            document.removeEventListener(
+                'touchmove',
+                handleDragOver
             );
             document.removeEventListener(
                 'touchend',
